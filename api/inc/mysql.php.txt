@@ -1,0 +1,6 @@
+<?php
+$mysql_server_name="localhost";
+$mysql_database="funds";
+$mysql_username="db user you created";
+$mysql_password="db user password you defined";
+?>
