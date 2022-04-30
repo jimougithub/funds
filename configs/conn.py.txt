@@ -1,0 +1,4 @@
+host='localhost'
+dbname='funds'
+dbuser='db user you created'
+dbpass='db user password you defined'
