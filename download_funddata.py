@@ -22,6 +22,7 @@ def downloadAllJsonData(db):
 
         fs_code = row[0]
         # download
+        download_done = utlities_eastmoney.downloadFundArchivesData(fs_code)
         download_done = utlities_eastmoney.downloadJsonData(fs_code)
         if download_done == 0:
             # update download date

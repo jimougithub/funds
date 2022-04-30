@@ -18,6 +18,12 @@ def getUrl(fscode):
   #print(head+fscode+tail)
   return head+fscode+tail
 
+def getFundArchivesDatasUrl(fscode):
+  head = 'http://fundf10.eastmoney.com/FundArchivesDatas.aspx?type=jdzf&code='
+  tail = '&rt=='+ utlities_common.getCurrentTime()
+  #print(head+fscode+tail)
+  return head+fscode+tail
+
 # get all the fund codes
 def getAllCode():
     url = 'http://fund.eastmoney.com/js/fundcode_search.js'
@@ -48,6 +54,29 @@ def downloadJsonData(fscode):
 
     # save file
     f = open(FOLDER_PATH + fscode+".json", "w")
+    f.write(req.text)
+    f.close()
+    return 0
+
+# download FundArchivesDatas json data from eastmoney
+def downloadFundArchivesData(fscode):
+    downloadDone = False
+    downloadCount = 0
+    while downloadDone == False and downloadCount<5:
+        try:
+            req = requests.get(getFundArchivesDatasUrl(fscode))
+            downloadDone = True
+        except Exception as e:
+            downloadCount += 1
+            print(e)
+    
+    # download failed. return None
+    if downloadDone == False or req.status_code != 200:
+        print(fscode + ": data not found xxxxxx")
+        return 1
+
+    # save file
+    f = open(FOLDER_PATH + fscode+"_arh.json", "w")
     f.write(req.text)
     f.close()
     return 0
@@ -165,6 +194,7 @@ def getData(fscode):
 '''
 # for testing
 downloadJsonData('110011')
+downloadFundArchivesData('000011')
 print(getData('110011'))
 '''
 
