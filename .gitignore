@@ -103,6 +103,7 @@ celerybeat.pid
 
 # Environments
 configs/
+backup/
 .env
 .venv
 env/
