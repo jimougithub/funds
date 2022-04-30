@@ -5,11 +5,16 @@ This project is to extract fund data of China
 1. Setup http server + php + mysql + phpmyadmin.　　// https://blog.csdn.net/u010427874/article/details/89007187  
 2. Create mysql database & tables by refer to database_tables.sql. The quick way to do that is restore database_tables.sql via phpmyadmin web portal  
 3. create a db user (e.g. funds_user) and grant write/delete/insert/read access to database funds.  
-4. Create a sub folder configs. create conn.py inside configs folder with following content  
+4. Create conn.py inside folder configs with following content  
     host='localhost'  
     dbname='funds'  
     dbuser='db user you created'  
     dbpass='db user password you defined'  
+5. Create mysql.php inside folder \api\inc\ with following content  
+    $mysql_server_name="localhost";  
+    $mysql_database="funds";  
+    $mysql_username="db user you created";  
+    $mysql_password="db user password you defined";  
 
 # Run python order
 1. python3 download_fundcode.py　　　// Download entire fund list. Not require to run every day. It is to detect any newly establish fund  
