@@ -106,6 +106,7 @@ backup/
 conn.py
 mysql.php
 *.json
+log.txt
 .env
 .venv
 env/
