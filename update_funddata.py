@@ -23,7 +23,7 @@ def updateFundAllData(db):
                 if writeFundData(db, fs_code, k, fundDatas[k]) == False:
                     # if data already exist no need to continue
                     break
-            updateFundYearly(db, fundInfo, fundDatas)                   # update yearly statistics
+            updateFundYearly(db, fundInfo, fundDatas)                       # update yearly statistics
             updateFundManager(db, fundInfo, download_date)                  # update fund manager
             updateFundInfo(db, fundInfo, fundDatas, download_date)          # update current statistics
             print(fs_code + ": update done")
@@ -240,7 +240,8 @@ def caculateRanking(fundDatas):
         break
 
     for val in fundDatas.values():
-        rankings.append(val.ranking)
+        if val.ranking > 0:
+            rankings.append(val.ranking)
 
     # find avage ranking
     avgRanking = np.ma.average(rankings)
