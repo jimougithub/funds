@@ -55,7 +55,8 @@ def downloadJsonData(fscode):
 # get fund's data
 def getData(fscode):
     try:
-        f = open(FOLDER_PATH + fscode+".json", "r", encoding="gbk")
+        #f = open(FOLDER_PATH + fscode+".json", "r", encoding="gbk")
+        f = open(FOLDER_PATH + fscode+".json", "r")
         jsContent = execjs.compile(f.read())
         f.close()
     except Exception as e:
