@@ -106,11 +106,11 @@ def updateFundYearly(db, fundInfo, fundDatas):
             maxDrawdown, maxDrawdownBegin, maxDrawdownEnd = caculateMaxChanges(fundYearlyDatas, Drawdown=True)
             maxIncrease, maxIncreaseBegin, maxIncreaseEnd = caculateMaxChanges(fundYearlyDatas, Drawdown=False)
             # Write fund yearly data to database
-            sql = """INSERT INTO fund_yearly(fund_id, fund_year, fund_increase, fund_ranking, 
+            sql = """INSERT INTO fund_yearly(fund_id, fund_year, fund_increase, fund_ranking, fund_avg_ranking, 
                     fund_maxdrawdown, fund_maxdrawdown_begin, fund_maxdrawdown_end, 
                     fund_maxincrease, fund_maxincrease_begin, fund_maxincrease_end) 
                     VALUES ('%s', %s, %s, %s, %s, %s, %s, %s, %s, %s)""" % \
-                    (fundInfo.fs_Code, yearVal, totalIncrease, curRanking, 
+                    (fundInfo.fs_Code, yearVal, totalIncrease, curRanking, avgRanking, 
                     maxDrawdown, maxDrawdownBegin, maxDrawdownEnd, 
                     maxIncrease, maxIncreaseBegin, maxIncreaseEnd)
             try:
