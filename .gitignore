@@ -102,9 +102,10 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-configs/
 backup/
+conn.py
 mysql.php
+*.json
 .env
 .venv
 env/
