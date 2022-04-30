@@ -8,7 +8,7 @@ from configs import conn
 def downloadAllJsonData(db):
     cursor = db.cursor()
     curr_date = utlities_common.getCurrentDate()
-    sql = """SELECT fund_id FROM fund_info WHERE fund_type<>'货币型' AND fund_download<%s ORDER BY fund_id DESC""" % curr_date
+    sql = """SELECT fund_id FROM fund_info WHERE fund_type<>'货币型' AND fund_name NOT LIKE '%(后端)%' AND fund_download<%s""" % curr_date
     cursor.execute(sql)
     rows = cursor.fetchall()
     i = 0
