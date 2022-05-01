@@ -237,6 +237,7 @@ def caculateIncrease(fundDatas, currDate):
 def caculateRanking(fundDatas):
     rankings = []
     lastRanking = 0
+    avgRanking = 0
     # the frist record is latest one
     for val in fundDatas.values():
         lastRanking = val.ranking
@@ -247,7 +248,8 @@ def caculateRanking(fundDatas):
             rankings.append(val.ranking)
 
     # find avage ranking
-    avgRanking = np.ma.average(rankings)
+    if len(rankings)>0:
+        avgRanking = np.ma.average(rankings)
     
     return lastRanking, avgRanking
 
