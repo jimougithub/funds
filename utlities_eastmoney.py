@@ -72,7 +72,7 @@ def downloadFundArchivesData(fscode):
     
     # download failed. return None
     if downloadDone == False or req.status_code != 200:
-        print(fscode + ": data not found xxxxxx")
+        print(fscode + ": FundArchivesDatas not found xxxxxx")
         return 1
 
     # save file
@@ -190,11 +190,41 @@ def getData(fscode):
     
     return fundInfo, fundDatas
 
+# get FundArchives data
+def getFundArchivesData(fscode):
+    rankings = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    try:
+        #f = open(FOLDER_PATH + fscode+"_arh.json", "r", encoding="gbk")
+        f = open(FOLDER_PATH + fscode+"_arh.json", "r")
+        apidata = f.read()
+        f.close()
+    except Exception as e:
+        print(e)
+        return rankings
+
+    #同类排名
+    try:
+        #apidata = jsContent.eval('apidata')
+        re_body = re.findall(r'</div></div></li></ul>(.*?)</div>', apidata)
+        re_arry = re.findall(r'<ul><li class=\'title\'>(?P<duration_name>.+?)</li><li class=\'.*?\'>(?P<fund_increase>.+?)[-|%]</li><li class=\'.*?\'>(?P<peer_increase>.+?)[-|%]</li><li class=\'.*?\'>(?P<stock300_increase>.+?)[-|%]</li>.*?<li class=\'tlpm\'>(?P<ranking>---|\d+)<font class=\'gray\'>\|</font>(?P<fund_count>\d+)</li><li class=\'pmbd\'>', re_body[0])
+        i = 0
+        for data in re_arry:
+            if data[4] != '---':
+                ranking_percent = int(data[4]) / int(data[5])
+                rankings[i] = ranking_percent
+                i = i + 1
+    except Exception as e:
+        print(e)
+        return rankings
+    
+    return rankings
 
 '''
 # for testing
 downloadJsonData('110011')
 downloadFundArchivesData('000011')
+downloadFundArchivesData('970042')
+getFundArchivesData('970042')
 print(getData('110011'))
 '''
 

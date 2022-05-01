@@ -44,6 +44,7 @@ def updateFundInfo(db, fundInfo, fundDatas, curr_date):
     maxIncreaseEnd = 0
     totalIncrease, avgIncrease, fs_start = caculateIncrease(fundDatas, curr_date)
     curRanking, avgRanking = caculateRanking(fundDatas)
+    rankings = utlities_eastmoney.getFundArchivesData(fundInfo.fs_Code)
     maxDrawdown, maxDrawdownBegin, maxDrawdownEnd = caculateMaxChanges(fundDatas, Drawdown=True)
     maxIncrease, maxIncreaseBegin, maxIncreaseEnd = caculateMaxChanges(fundDatas, Drawdown=False)
 
@@ -52,12 +53,14 @@ def updateFundInfo(db, fundInfo, fundDatas, curr_date):
     sql = """UPDATE fund_info SET fund_managerId='%s', 
             fs_pfm_bond=%s, fs_pfm_profit=%s, fs_pfm_riskcontrol=%s, fs_pfm_consistency=%s, fs_pfm_timing=%s, 
             fund_increase=%s, fund_avg_increase=%s, fund_cur_ranking=%s, fund_avg_ranking=%s,
+            fund_ranking_ytd=%s, fund_ranking_1w=%s, fund_ranking_1m=%s, fund_ranking_3m=%s, fund_ranking_6m=%s, fund_ranking_1y=%s, fund_ranking_2y=%s, fund_ranking_3y=%s, fund_ranking_5y=%s,
             fund_maxdrawdown=%s, fund_maxdrawdown_begin=%s, fund_maxdrawdown_end=%s, 
             fund_maxincrease=%s, fund_maxincrease_begin=%s, fund_maxincrease_end=%s, 
             fs_start=%s, fund_update=%s WHERE fund_id='%s'""" % \
         (fundInfo.fs_ManagerId, 
         fundInfo.fs_pfm_bond, fundInfo.fs_pfm_profit, fundInfo.fs_pfm_riskcontrol, fundInfo.fs_pfm_consistency, fundInfo.fs_pfm_timing,
         totalIncrease, avgIncrease, curRanking, avgRanking,
+        rankings[0], rankings[1], rankings[2], rankings[3], rankings[4], rankings[5], rankings[6], rankings[7], rankings[8], 
         maxDrawdown, maxDrawdownBegin, maxDrawdownEnd, 
         maxIncrease, maxIncreaseBegin, maxIncreaseEnd, 
         fs_start, curr_date, fundInfo.fs_Code)
