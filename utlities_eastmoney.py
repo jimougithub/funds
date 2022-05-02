@@ -220,7 +220,7 @@ def getFundArchivesData(fscode):
             for data in re_arry:
                 if data[4] != '---' and data[5] != '---':
                     ranking_percent = int(data[4]) / int(data[5])
-                    rankings[i] = ranking_percent
+                    rankings[i] = ranking_percent * 100
                     i = i + 1
     except Exception as e:
         print(e)
