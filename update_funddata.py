@@ -243,7 +243,7 @@ def caculateRanking(fundDatas):
     avgRanking = 0
     # the frist record is latest one
     for val in fundDatas.values():
-        lastRanking = val.ranking
+        lastRanking = val.ranking / 100
         break
 
     for val in fundDatas.values():
