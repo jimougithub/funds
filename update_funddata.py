@@ -17,7 +17,7 @@ def updateFundAllData(db):
         download_date = row[1]
         # update database
         fundInfo, fundDatas = utlities_eastmoney.getData(fs_code)
-        if fundInfo != None and fundDatas != None and fundDatas != {}:
+        if fundInfo != None and fundDatas != None:
             # too many data, skip writting fund data for the moment
             for k in fundDatas:
                 if writeFundData(db, fs_code, k, fundDatas[k]) == False:
@@ -85,6 +85,9 @@ def updateFundYearly(db, fundInfo, fundDatas):
         db.rollback()
         print(e)
         print(fundInfo.fs_Code + ": update fund yearly data error: " + sql)
+
+    if len(fundDatas) == 0:
+        return None
 
     # caculate yearly increasment, ranking and drawdown
     yearVal = list(fundDatas.keys())[0][0:4]        # first record's year
