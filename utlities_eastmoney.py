@@ -92,11 +92,6 @@ def getData(fscode):
         print(e)
         return None, None
 
-    currencyFund = jsContent.eval('ishb')
-    if currencyFund == True:
-        print(fscode + ": ignore currency fund")
-        return None, None
-
     #基本信息
     fs_Name = jsContent.eval('fS_name')
     fs_Code = jsContent.eval('fS_code')
@@ -144,6 +139,16 @@ def getData(fscode):
         ACWorthTrend = jsContent.eval('Data_ACWorthTrend')
     except:
         ACWorthTrend = []
+    #货币基金：基金收益走势图 每万份收益 --> 累计净值走势
+    if len(ACWorthTrend) == 0:
+        baseAmount = 1.00000
+        try:
+            millionCopiesIncomes = jsContent.eval('Data_millionCopiesIncome')
+            for income in millionCopiesIncomes:
+                baseAmount = baseAmount + income[1]/10000
+                ACWorthTrend.append([income[0], baseAmount])
+        except:
+            millionCopiesIncomes = []
     
     #同类排名百分比
     try:
@@ -206,13 +211,17 @@ def getFundArchivesData(fscode):
     try:
         #apidata = jsContent.eval('apidata')
         re_body = re.findall(r'</div></div></li></ul>(.*?)</div>', apidata)
-        re_arry = re.findall(r'<ul><li class=\'title\'>(?P<duration_name>.+?)</li><li class=\'.*?\'>(?P<fund_increase>.+?)[-|%]</li><li class=\'.*?\'>(?P<peer_increase>.+?)[-|%]</li><li class=\'.*?\'>(?P<stock300_increase>.+?)[-|%]</li>.*?<li class=\'tlpm\'>(?P<ranking>---|\d+)<font class=\'gray\'>\|</font>(?P<fund_count>\d+)</li><li class=\'pmbd\'>', re_body[0])
-        i = 0
-        for data in re_arry:
-            if data[4] != '---':
-                ranking_percent = int(data[4]) / int(data[5])
-                rankings[i] = ranking_percent
-                i = i + 1
+        if "<li class='title'>今年来</li><li class='tlpm'>---</li><li class='tlpm'>---</li><li class='tlpm'>---</li><li class='tlpm'>---</li>" in re_body[0]:
+            # no data
+            return rankings
+        else:
+            re_arry = re.findall(r'<ul><li class=\'title\'>(?P<duration_name>.+?)</li><li class=\'.*?\'>(?P<fund_increase>.+?)[-|%]</li><li class=\'.*?\'>(?P<peer_increase>.+?)[-|%]</li><li class=\'.*?\'>(?P<stock300_increase>.+?)[-|%]</li>.*?<li class=\'tlpm\'>(?P<ranking>---|\d+)<font class=\'gray\'>\|</font>(?P<fund_count>---|\d+)</li><li class=\'pmbd\'>', re_body[0])
+            i = 0
+            for data in re_arry:
+                if data[4] != '---' and data[5] != '---':
+                    ranking_percent = int(data[4]) / int(data[5])
+                    rankings[i] = ranking_percent
+                    i = i + 1
     except Exception as e:
         print(e)
         return rankings
@@ -224,6 +233,8 @@ def getFundArchivesData(fscode):
 downloadJsonData('110011')
 downloadFundArchivesData('000011')
 downloadFundArchivesData('970042')
+downloadJsonData('000009')
+downloadFundArchivesData('000009')
 getFundArchivesData('970042')
 print(getData('110011'))
 '''

@@ -9,7 +9,7 @@ from configs import conn
 # update fund data 1 by 1 from json data ====================================================
 def updateFundAllData(db):
     cursor = db.cursor()
-    sql = """SELECT fund_id, fund_download FROM fund_info WHERE fund_type<>'货币型' AND fund_update<fund_download"""
+    sql = """SELECT fund_id, fund_download FROM fund_info WHERE fund_update<fund_download"""
     cursor.execute(sql)
     rows = cursor.fetchall()
     for row in rows:
