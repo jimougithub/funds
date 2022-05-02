@@ -252,7 +252,7 @@ def caculateRanking(fundDatas):
 
     # find avage ranking
     if len(rankings)>0:
-        avgRanking = np.ma.average(rankings)
+        avgRanking = np.ma.average(rankings) / 100
     
     return lastRanking, avgRanking
 
