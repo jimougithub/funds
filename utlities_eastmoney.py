@@ -211,7 +211,7 @@ def getFundArchivesData(fscode):
     try:
         #apidata = jsContent.eval('apidata')
         re_body = re.findall(r'</div></div></li></ul>(.*?)</div>', apidata)
-        if "<li class='title'>今年来</li><li class='tlpm'>---</li><li class='tlpm'>---</li><li class='tlpm'>---</li><li class='tlpm'>---</li>" in re_body[0]:
+        if "<ul><li class='title'>今年来</li><li class='tlpm'>---</li><li class='tlpm'>---</li>" in re_body[0]:
             # no data
             return rankings
         else:
@@ -245,3 +245,4 @@ fs_codes = getAllCode()
 for code in fs_codes:
     print(code)
 '''
+getFundArchivesData('180301')
