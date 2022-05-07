@@ -3,13 +3,19 @@ import re
 import utlities_eastmoney
 import pymysql
 import datetime
+import argparse
 from configs import conn
 
+# Parameters
+parser = argparse.ArgumentParser(description='--frm 001000 --to 005000')
+parser.add_argument('--frm', type=int, default=000000)
+parser.add_argument('--to', type=int, default=999999)
+args = parser.parse_args()
 
 # update fund data 1 by 1 from json data ====================================================
 def updateFundAllData(db):
     cursor = db.cursor()
-    sql = """SELECT fund_id, fund_download FROM fund_info WHERE fund_update<fund_download"""
+    sql = """SELECT fund_id, fund_download FROM fund_info WHERE fund_update<fund_download AND fund_id between %s and %s""" % (args.frm, args.to)
     cursor.execute(sql)
     rows = cursor.fetchall()
     for row in rows:
