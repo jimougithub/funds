@@ -16,6 +16,16 @@ This project is to extract fund data of China
     $mysql_username="db user you created";  
     $mysql_password="db user password you defined";  
 
+# Prerequisite package
+1. apt install python3
+2. apt install python3-pip
+3. apt install apache2
+4. apt install php
+5. apt install php-mysql
+6. pip3 install pyExecJs
+7. pip3 install pymysql
+8. pip3 install nodejs
+
 # Run python order
 1. python3 download_fundcode.py　　　// Download entire fund list. Not require to run every day. It is to detect any newly establish fund  
 2. python3 download_funddata.py　　　// Download all fund history (except currency fund).   
