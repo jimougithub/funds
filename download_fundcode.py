@@ -10,7 +10,7 @@ def downloadAllFundCodes(db):
     # Write fund_info table
     for fs_code in fs_codes:
         if "(后端)" not in fs_code[2]:
-            print(fs_code)
+            # print(fs_code)
             cursor = db.cursor()
             sql = """SELECT * FROM fund_info WHERE fund_id='%s'""" % fs_code[0]
             cursor.execute(sql)
