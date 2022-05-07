@@ -6,8 +6,8 @@ import argparse
 from configs import conn
 
 # Parameters
-parser = argparse.ArgumentParser(description='--from 001000 --to 005000')
-parser.add_argument('--frm', type=int, default=0)
+parser = argparse.ArgumentParser(description='--frm 001000 --to 005000')
+parser.add_argument('--frm', type=int, default=000000)
 parser.add_argument('--to', type=int, default=999999)
 args = parser.parse_args()
 
