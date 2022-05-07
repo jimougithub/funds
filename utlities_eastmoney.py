@@ -245,4 +245,3 @@ fs_codes = getAllCode()
 for code in fs_codes:
     print(code)
 '''
-getFundArchivesData('180301')
