@@ -6,16 +6,20 @@ import argparse
 from configs import conn
 
 # Parameters
-parser = argparse.ArgumentParser(description='--frm 001000 --to 005000')
-parser.add_argument('--frm', type=int, default=000000)
+parser = argparse.ArgumentParser(description='--frm 001000 --to 005000 --id 515293')
+parser.add_argument('--frm', type=int, default=0)
 parser.add_argument('--to', type=int, default=999999)
+parser.add_argument('--id', type=int, default=0)
 args = parser.parse_args()
 
 # download fund json data 1 by 1
 def downloadAllJsonData(db):
     cursor = db.cursor()
     curr_date = utlities_common.getCurrentDate()
-    sql = """SELECT fund_id FROM fund_info WHERE fund_download<%s and fund_id between %s and %s""" % (curr_date, args.frm, args.to)
+    if args.id > 0:
+        sql = """SELECT fund_id FROM fund_info WHERE fund_id = %s""" % (args.id)
+    else:
+        sql = """SELECT fund_id FROM fund_info WHERE fund_download<%s and fund_id between %s and %s""" % (curr_date, args.frm, args.to)
     cursor.execute(sql)
     rows = cursor.fetchall()
     i = 0
