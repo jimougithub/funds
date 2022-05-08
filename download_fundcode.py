@@ -4,14 +4,21 @@ from configs import conn
 
 # download list of fund codes into databases
 def downloadAllFundCodes(db):
+    cursor = db.cursor()
+
     # Load all the funds id
     fs_codes = utlities_eastmoney.getAllCode()
 
+    # housekeep those demised fund id
+    sql = "DELETE FROM `fund_info` where fund_type is null OR fs_start = 0 OR fund_name like '%(后端)%'"
+    cursor.execute(sql)
+    db.commit()
+
     # Write fund_info table
+    fs_name = ''
     for fs_code in fs_codes:
-        if "(后端)" not in fs_code[2]:
-            # print(fs_code)
-            cursor = db.cursor()
+        if "(后端)" not in fs_code[2] and fs_name != fs_code[1]:
+            fs_name = fs_code[1]
             sql = """SELECT * FROM fund_info WHERE fund_id='%s'""" % fs_code[0]
             cursor.execute(sql)
             if cursor.rowcount > 0:
@@ -38,11 +45,6 @@ def downloadAllFundCodes(db):
                     db.rollback()
                     print(fs_code[0] + ": write fund_info error: " + sql)
     
-    # housekeep those demised fund id
-    sql = "DELETE FROM `fund_info` where fund_type is null OR fund_name like '%(后端)%'"
-    cursor.execute(sql)
-    db.commit()
-
     return True
 
 
