@@ -3,14 +3,25 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="./jquery-ui-1.12.1/jquery-ui.min.css">
-<title>Fund Analysis</title>
+<link rel="stylesheet" type="text/css" href="./jquery-ui-1.12.1/jquery-ui.min.css">
+<link rel="stylesheet" type="text/css" href="./datatables/datatables.min.css">
+<link rel="stylesheet" type="text/css" href="./css/funds.css">
+<link rel="shortcut icon" href="./img/search-funds.png"/>
+<title>基金分析</title>
 </head>
 <body>
 <div id="search_box" style="height: 100px; width: 100%;">
 <table border="0">
 <tr>
-	<td>Fund ID:</td>
+	<td>菜单</td>
+	<td>
+		<a href="./"><button>基金对比</button></a> 
+		<a href="./?feature=4433"><button>4433选基</button></a> 
+		<a href="./?feature=maxdrawdown"><button>最大回撤选基</button></a>
+	</td>
+</tr>
+<tr id="search_id_tr">
+	<td>基金代码:</td>
 	<td>
 		<input type="text" id="id1" value="162605" maxlength="6" style="width: 60px;"/> 
 		<input type="text" id="id2" value="000000" maxlength="6" style="width: 60px;"/> 
@@ -24,16 +35,47 @@
 		<input type="text" id="id10" value="000000" maxlength="6" style="width: 60px;"/>
 	</td>
 </tr>
-<tr>
-	<td>Date Range:</td>
+<tr id="search_type_tr">
+	<td>基金类型</td>
+	<td>
+		<select name="dropdown_fund_type" id="dropdown_fund_type">
+			<option value="股票型">股票型</option>
+			<option value="混合型-偏股">混合型-偏股</option>
+			<option value="混合型-偏债">混合型-偏债</option>
+			<option value="混合型-灵活">混合型-灵活</option>
+			<option value="混合型-平衡">混合型-平衡</option>
+			<option value="混合-绝对收益">混合-绝对收益</option>
+			<option value="债券型-混合债">债券型-混合债</option>
+			<option value="债券型-可转债">债券型-可转债</option>
+			<option value="债券型-中短债">债券型-中短债</option>
+			<option value="债券型-长债">债券型-长债</option>
+			<option value="指数型-股票">指数型-股票</option>
+			<option value="货币型">货币型</option>
+			<option value="理财型">理财型</option>
+			<option value="QDII">QDII</option>
+			<option value="商品（不含QDII）">商品（不含QDII）</option>
+			<option value="FOF">FOF</option>
+			<option value="Reits">Reits</option>
+		</select>
+	</td>
+</tr>
+<tr id="date_range_tr">
+	<td>日期:</td>
 	<td>
 		<input type="text" id="date_begin" value="20020101" maxlength="8" style="width: 60px;"/> 
 		<input type="text" id="date_end" value="00000000" maxlength="8" style="width: 60px;"/> 
-		<button type="button" id="button_search">Search</button>
+		<button type="button" id="button_search1">Search</button>
 	</td>
 </tr>
-<tr>
-	<td>Compare value:</td>
+<tr id="date_start_tr">
+	<td>成立早于:</td>
+	<td>
+		<input type="text" id="date_start" value="20150101" maxlength="8" style="width: 60px;"/> 
+		<button type="button" id="button_search2">Search</button>
+	</td>
+</tr>
+<tr id="compare_value_tr">
+	<td>对比值:</td>
 	<td>
 		<select id="yvalue">
 			<option value="net_worth_pcent">累计收益率%</option>
@@ -43,18 +85,29 @@
 		</select>
 	</td>
 </tr>
+<tr id="show_columns_tr">
+	<td>列表显示:</td>
+	<td>
+		<input type="checkbox" id="cb_max_increase" name="cb_max_increase" checked="checked"><label for="cb_max_increase">最大升幅</label>
+		<input type="checkbox" id="cb_max_maxdrawdown" name="cb_max_maxdrawdown" checked="checked"><label for="cb_max_maxdrawdown">最大回撤</label>
+		<input type="checkbox" id="cb_ranking" name="cb_ranking" checked="checked"><label for="cb_ranking">历史排名</label>
+		<input type="checkbox" id="cb_increase" name="cb_increase" checked="checked"><label for="cb_increase">历史升幅</label>
+	</td>
+</tr>
 </table>
 </div>
 
-<div id="stockChartContainer" style="margin:0 auto; height: 100%; width: 100%;"></div>
-<div id="div_fund_info" style="margin:0 auto; font-size:12px; width: 100%; margin-top:620px; margin-left:78px"></div>
+<div id="stockChartContainer" style="margin:0 auto; height: 100%; width: 100%; margin-top:10px"></div>
+<div id="div_fund_info" style="margin:0 auto; font-size:12px; width: 100%; margin-top:10px; margin-left:10px"></div>
 
 <script src="./jquery/jquery-1.8.3.min.js"></script>
 <script src="./canvasjs-stock-1.2.8/canvasjs.stock.min.js"></script>
 <script src="./jquery-ui-1.12.1/jquery-ui.min.js"></script>
+<script src="./datatables/datatables.min.js"></script>
 <script src="./js/utl.js"></script>
 <script src="./js/chart.js"></script>
 <script>
+	var feature = "";
 	$(function() {
 		$("#date_begin").datepicker({
 			dateFormat: 'yymmdd',
@@ -64,19 +117,110 @@
 			dateFormat: 'yymmdd',
 			showButtonPanel: true
 		});
+		$("#date_start").datepicker({
+			dateFormat: 'yymmdd',
+			showButtonPanel: true
+		});
+		urlParams = new URLSearchParams(window.location.search);
+		feature = urlParams.get('feature')
+		if (feature != null){
+			$("#search_id_tr").hide();
+			$("#stockChartContainer").hide();
+			$("#compare_value_tr").hide();
+			$("#date_range_tr").hide();
+		} else {
+			$("#div_fund_info").css("margin-top", "630px");
+			$("#date_start_tr").hide();
+		}
+		if (feature != "4433" && feature != "maxdrawdown"){
+			$("#search_type_tr").hide();
+		}
 	});
+
+	//retrieve cookie setting
 	if (getCookie('date_begin')!=null){
 		$('#date_begin').val(getCookie('date_begin'));
 	}
 	$('#date_end').val(format_yyyymmdd(new Date()));
-	
+	if (getCookie('date_start')!=null){
+		$('#date_start').val(getCookie('date_start'));
+	} else {
+		$('#date_start').val(format_yyyymmdd(new Date()));
+	}
 	for (i=1; i <= 10; i++) {
 		if (getCookie('id'+i)) $('#id'+i).val(getCookie('id'+i));
 	}
+	if (getCookie('cb_max_increase')!=null || getCookie('cb_max_increase')==false){
+		$('#cb_max_increase').prop('checked', false);
+	}
+	if (getCookie('cb_max_maxdrawdown')!=null || getCookie('cb_max_maxdrawdown')==false){
+		$('#cb_max_maxdrawdown').prop('checked', false);
+	}
+	if (getCookie('cb_ranking')!=null || getCookie('cb_ranking')==false){
+		$('#cb_ranking').prop('checked', false);
+	}
+	if (getCookie('cb_increase')!=null || getCookie('cb_increase')==false){
+		$('#cb_increase').prop('checked', false);
+	}
+	$("#cb_max_increase").change(function() {
+		setCookie('cb_max_increase', this.checked, 365);
+		show_columns("cb_max_increase", this.checked);
+	});
+	$("#cb_max_maxdrawdown").change(function() {
+		setCookie('cb_max_maxdrawdown', this.checked, 365);
+		show_columns("cb_max_maxdrawdown", this.checked);
+	});
+	$("#cb_ranking").change(function() {
+		setCookie('cb_ranking', this.checked, 365);
+		show_columns("cb_ranking", this.checked);
+	});
+	$("#cb_increase").change(function() {
+		setCookie('cb_increase', this.checked, 365);
+		show_columns("cb_increase", this.checked);
+	});
 	
 	// search
-	$('#button_search').click(function(){
-		var date_begin=0, date_end=0;
+	$('#button_search1').click(function(){
+		click_search();
+	});
+	$('#button_search2').click(function(){
+		click_search();
+	});
+
+	// search 
+	function click_search(){
+		// get date range
+		var date_begin=0, date_end=0; date_start=0;
+		if ($('#date_begin').val().trim().length == 8 && $('#date_begin').val().trim()!="00000000") {
+			date_begin = $('#date_begin').val().trim();
+			setCookie('date_begin', date_begin,365);
+		}
+		if ($('#date_end').val().trim().length == 8 && $('#date_end').val().trim()!="00000000") {
+			date_end = $('#date_end').val().trim();
+		}
+		if ($('#date_start').val().trim().length == 8 && $('#date_start').val().trim()!="00000000") {
+			date_start = $('#date_start').val().trim();
+			setCookie('date_start', date_start,365);
+		}
+
+		// search by fund ids ---------------------------
+		if (feature == null){
+			search_by_ids(date_begin, date_end);
+		}
+
+		// search by 4433 -------------------------------
+		if (feature == "4433"){
+			search_by_4433(date_start, date_end);
+		}
+
+		// search by maxdrawdown-------------------------
+		if (feature == "maxdrawdown"){
+			search_by_maxdrawdown(date_start, date_end);
+		}
+	}
+
+	// search by ids
+	function search_by_ids(date_begin, date_end){
 		for (i=1; i<=10; i++){
 			if ($('#id'+i).val().trim().trim()=='') {
 				$('#id'+i).val('000000')
@@ -96,22 +240,30 @@
 		}
 		var ids = $('#id1').val().trim();
 		for (i=2; i<=10; i++){
-			if ($('#id'+i).val().trim()!='000000')ids += ',' + $('#id'+i).val().trim();
+			if ($('#id'+i).val().trim()!='000000'){
+				ids += ',' + $('#id'+i).val().trim();
+			}
 		}
 		
 		for (i=1; i<=10; i++){
 			setCookie('id'+i, $('#id'+i).val().trim(),365);
 		}
 		
-		if ($('#date_begin').val().trim().length == 8 && $('#date_begin').val().trim()!="00000000") {
-			date_begin = $('#date_begin').val().trim();
-			setCookie('date_begin', date_begin,365);
-		}
-		if ($('#date_end').val().trim().length == 8 && $('#date_end').val().trim()!="00000000") {
-			date_end = $('#date_end').val().trim();
-		}
-		load_fund_data(ids, date_begin, date_end);
-	});
+		key = ids;
+		search_fund_data("ids", key, date_begin, date_end);
+	}
+
+	// search by 4433
+	function search_by_4433(date_start, date_end){
+		key = $('#dropdown_fund_type').val().trim();
+		search_fund_data("4433", key, date_start, date_end);
+	}
+
+	// search by maxdrawdown
+	function search_by_maxdrawdown(date_start, date_end){
+		key = $('#dropdown_fund_type').val().trim();
+		search_fund_data("maxdrawdown", key, date_start, date_end);
+	}
 	
 	// change y data
 	$('#yvalue').on('change', function() {

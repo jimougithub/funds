@@ -1,4 +1,5 @@
 var chart = null;
+const max_count = 100;
 var fund_info =  new Array();		//基金信息
 var fund_code =  new Array();		//基金代码
 var shares_position = new Array();	//股票仓位
@@ -9,18 +10,21 @@ var ac_worth_pcent = new Array();	//累计净值%
 var equity_return = new Array();	//净值回报
 var unit_money = new Array();		//分红金额
 var ranking = new Array();			//同类排名
+var years = new Array();			//年份
 var show_data = new Array();
 var colors = ['#E53935', '#1E88E5', '#43A047', '#FFB300', '#8E24AA', '#00FF33', '#5E35B1', '#FF00FF', '#0033FF', '#990000'];
 
-function load_fund_data(fundid, date_begin, date_end) {
-	// load and prepare data
-	var url = "../api/search/?fundid=" + fundid
+function search_fund_data(feature, keys, date_begin, date_end) {
+	// generate url
+	var url = "../api/search/?feature="+ feature +"&keys=" + keys;
 	if (date_begin>0){
 		url = url + "&date_begin="+date_begin;
 	}
 	if (date_end>0){
 		url = url + "&date_end="+date_end;
 	}
+
+	// submit request
 	$.ajax({
 		url: url,
 		type: "GET",
@@ -29,11 +33,28 @@ function load_fund_data(fundid, date_begin, date_end) {
 			if(json.result==0){
 				// fund info
 				var info = json.info;
+				var yearly = json.yearly;
 				fund_info = new Array();
 				for (i=0; i < info.length; i++) {
+					// load yearly data
+					fund_yearly = new Array();
+					for (j=0; j<yearly.length; j++){
+						if (yearly[j]['fund_id']==info[i]['fund_id']){
+							fund_yearly.push({
+								fund_year: yearly[j]['fund_year'],
+								fund_increase: yearly[j]['fund_increase'],
+								fund_avg_ranking: yearly[j]['fund_avg_ranking']
+							})
+							if (years.indexOf(yearly[j]['fund_year'])<0){
+								years.push(yearly[j]['fund_year'])
+							}
+						}
+					}
+
 					fund_info.push({
 						fund_id: info[i]['fund_id'],
 						fund_name: info[i]['fund_name'],
+						fund_type: info[i]['fund_type'],
 						fund_managerId: info[i]['fund_managerId'],
 						mg_name: info[i]['mg_name'],
 						fs_start: info[i]['fs_start'],
@@ -46,31 +67,30 @@ function load_fund_data(fundid, date_begin, date_end) {
 						fund_maxdrawdown_end: info[i]['fund_maxdrawdown_end'],
 						fund_maxincrease: info[i]['fund_maxincrease'],
 						fund_maxincrease_begin: info[i]['fund_maxincrease_begin'],
-						fund_maxincrease_end: info[i]['fund_maxincrease_end']
+						fund_maxincrease_end: info[i]['fund_maxincrease_end'],
+						fund_ranking_ytd: info[i]['fund_ranking_ytd'],
+						fund_ranking_1w: info[i]['fund_ranking_1w'],
+						fund_ranking_1m: info[i]['fund_ranking_1m'],
+						fund_ranking_3m: info[i]['fund_ranking_3m'],
+						fund_ranking_6m: info[i]['fund_ranking_6m'],
+						fund_ranking_1y: info[i]['fund_ranking_1y'],
+						fund_ranking_2y: info[i]['fund_ranking_2y'],
+						fund_ranking_3y: info[i]['fund_ranking_3y'],
+						fund_ranking_5y: info[i]['fund_ranking_5y'],
+						fund_increase_yearly: fund_yearly
 					})
 				}
-				for (i=0; i < 10; i++) {
+				for (i=0; i < max_count; i++) {
 					fund_info.push({
 						fund_id: '000000',
 						fund_name: '',
-						fund_managerId: '000000',
-						mg_name: '',
-						fs_start: '',
-						fund_increase: '',
-						fund_avg_increase: '',
-						fund_cur_ranking: '',
-						fund_avg_ranking: '',
-						fund_maxdrawdown: '',
-						fund_maxdrawdown_begin: '',
-						fund_maxdrawdown_end: '',
-						fund_maxincrease: '',
-						fund_maxincrease_begin: '',
-						fund_maxincrease_end: ''
+						fund_type: '',
+						fund_managerId: '000000'
 					})
 				}
 				
 				// fund data
-				for (i=0; i < 10; i++) {
+				for (i=0; i < max_count; i++) {
 						fund_code[i] = '000000';
 						shares_position[i] = new Array();
 						net_worth[i] = new Array();
@@ -157,9 +177,17 @@ function load_fund_data(fundid, date_begin, date_end) {
 						});
 					}
 				}
-				change_yvalue();
-				chart = create_chart();
-				show_fund_info();
+				
+				// Show data
+				if (feature == 'ids'){
+					if (info.length>0){
+						change_yvalue();
+						chart = create_chart();
+					} else {
+						chart.destroy();
+					}
+				}
+				show_fund_info(feature);
 			} else {
 				console.log(json.reason)
 			}
@@ -328,28 +356,133 @@ function create_chart(){
 }
 
 // show fund info
-function show_fund_info(){
-	var info_val = "<table border=\"1\"><tr><th>Id</th><th>Name</th><th>Manager</th><th>Establish Date</th><th>Total Increment</th><th>Avg Yearly Increment</th><th>Current Ranking</th><th>Avg Ranking</th><th>Max Increment</th><th>Increase Begin</th><th>Increase End</th><th>Max Drawdown</th><th>Drawdown Begin</th><th>Drawdown End</th></tr>";
-	for (i=0; i < 10; i++) {
+function show_fund_info(feature){
+	var having_data = false;
+	var info_val = "<table id='table_data' class='display'><thead><tr><th>基金代码</th><th>基金名称</th><th>基金类型</th><th>基金经理</th><th>成立日期</th><th>总升幅</th><th>年均升幅</th><th>当前同业排名</th><th>平均同业排名</th><th>最大升幅</th><th>升幅开始</th><th>升幅结束</th><th>最大回撤</th><th>回撤开始</th><th>回撤结束</th><th>YTD同业排名</th><th>1周同业排名</th><th>1个月同业排名</th><th>3个月同业排名</th><th>6个月同业排名</th><th>1年同业排名</th><th>2年同业排名</th><th>3年同业排名</th><th>5年同业排名</th>";
+	years.sort();
+	for (i=0; i < years.length; i++) {
+		info_val = info_val + "<th>"+ years[i] +"升幅</th>";
+	}
+	info_val = info_val + "</tr></thead><tbody>";
+	for (i=0; i < max_count; i++) {
 		if (fund_info[i].fund_id!='000000'){
+			having_data = true;
 			info_val += "<tr><td><b><font color="+ colors[i] +">"+ fund_info[i].fund_id +"</font></b></td><td>"+ 
 									fund_info[i].fund_name +"</td><td>"+ 
+									fund_info[i].fund_type +"</td><td>"+ 
 									fund_info[i].mg_name +"</td><td>"+
-									fund_info[i].fs_start +"</td><td>"+
-									(fund_info[i].fund_increase*100).toFixed(2) +"</td><td>"+
-									"<b><font color='#0fd132'>"+ (fund_info[i].fund_avg_increase*100).toFixed(2) +"</font></b></td><td>"+
-									(fund_info[i].fund_cur_ranking*1).toFixed(2) +"</td><td>"+
-									(fund_info[i].fund_avg_ranking*1).toFixed(2) +"</td><td>"+
-									"<b><font color='#0fd132'>"+ (fund_info[i].fund_maxincrease*100).toFixed(2) +"</font></b></td><td>"+
+									fund_info[i].fs_start +"</td><td class='txt-right'>"+
+									(fund_info[i].fund_increase*100).toFixed(2) +"%</td><td class='txt-right'>"+
+									"<b><font color='red'>"+ (fund_info[i].fund_avg_increase*100).toFixed(2) +"%</font></b></td><td class='txt-right'>"+
+									(fund_info[i].fund_cur_ranking*100).toFixed(2) +"%</td><td class='txt-right'>"+
+									(fund_info[i].fund_avg_ranking*100).toFixed(2) +"%</td><td class='txt-right'>"+
+									"<b><font color='red'>"+ (fund_info[i].fund_maxincrease*100).toFixed(2) +"%</font></b></td><td>"+
 									fund_info[i].fund_maxincrease_begin +"</td><td>"+
-									fund_info[i].fund_maxincrease_end +"</td><td>"+
-									"<b><font color='red'>"+ (fund_info[i].fund_maxdrawdown*100).toFixed(2) +"</font></b></td><td>"+
+									fund_info[i].fund_maxincrease_end +"</td><td class='txt-right'>"+
+									"<b><font color='#0fd132'>"+ (fund_info[i].fund_maxdrawdown*100).toFixed(2) +"%</font></b></td><td>"+
 									fund_info[i].fund_maxdrawdown_begin +"</td><td>"+
-									fund_info[i].fund_maxdrawdown_end +"</td></tr>"
+									fund_info[i].fund_maxdrawdown_end +"</td><td class='txt-right'>"+
+									(fund_info[i].fund_ranking_ytd*100).toFixed(2) +"%</td><td class='txt-right'>"+
+									(fund_info[i].fund_ranking_1w*100).toFixed(2) +"%</td><td class='txt-right'>"+
+									(fund_info[i].fund_ranking_1m*100).toFixed(2) +"%</td><td class='txt-right'>"+
+									(fund_info[i].fund_ranking_3m*100).toFixed(2) +"%</td><td class='txt-right'>"+
+									(fund_info[i].fund_ranking_6m*100).toFixed(2) +"%</td><td class='txt-right'>"+
+									(fund_info[i].fund_ranking_1y*100).toFixed(2) +"%</td><td class='txt-right'>"+
+									(fund_info[i].fund_ranking_2y*100).toFixed(2) +"%</td><td class='txt-right'>"+
+									(fund_info[i].fund_ranking_3y*100).toFixed(2) +"%</td><td class='txt-right'>"+
+									(fund_info[i].fund_ranking_5y*100).toFixed(2) +"%</td>";
+			for (n=0; n < years.length; n++) {
+				year_increase = "";
+				for (j=0; j < fund_info[i].fund_increase_yearly.length; j++) {
+					if (years[n] == fund_info[i].fund_increase_yearly[j].fund_year){
+						year_increase = (fund_info[i].fund_increase_yearly[j].fund_increase*100).toFixed(2);
+						if (fund_info[i].fund_increase_yearly[j].fund_increase>0){
+							year_increase = "<font color='red'>" + year_increase + "%</font>";
+						} else {
+							year_increase = "<font color='#0fd132'>" + year_increase + "%</font>";
+						}
+					}
+				}
+				info_val = info_val + "<td class='txt-right'>"+ year_increase +"</td>";
+			}
+			info_val = info_val + "</tr>";
 		}
 	}
-	info_val += "</table>";
-	$('#div_fund_info').html(info_val);
+	info_val += "</tbody></table>";
+	if (having_data){
+		// sorting
+		$('#div_fund_info').html(info_val);
+		if (feature == "ids"){
+			$('#table_data').DataTable( {
+				paging: false,
+				order: [[0, 'asc']],
+			} );
+		} else if(feature == "4433") {
+			$('#table_data').DataTable( {
+				paging: false,
+				order: [[6, 'desc']],
+			} );
+		} else if(feature == "maxdrawdown") {
+			$('#table_data').DataTable( {
+				paging: false,
+				order: [[12, 'asc']],
+			} );
+		}
+		// show / hide
+		show_columns("cb_max_increase", getCookie('cb_max_increase'));
+		show_columns("cb_max_maxdrawdown", getCookie('cb_max_maxdrawdown'));
+		show_columns("cb_ranking", getCookie('cb_ranking'));
+		show_columns("cb_increase", getCookie('cb_increase'));
+	} else {
+		$('#div_fund_info').html("no data");
+	}
+}
+
+// show / hide columns
+function show_columns(category, show){
+	if (category == "cb_max_increase"){
+		if (show == true || show == "true"){
+			for (n=10; n < 13; n++) {
+				$('td:nth-child('+ n +'),th:nth-child('+ n +')').show();
+			}
+		} else {
+			for (n=10; n < 13; n++) {
+				$('td:nth-child('+ n +'),th:nth-child('+ n +')').hide();
+			}
+		}
+	} else if (category == "cb_max_maxdrawdown"){
+		if (show == true || show == "true"){
+			for (n=13; n < 16; n++) {
+				$('td:nth-child('+ n +'),th:nth-child('+ n +')').show();
+			}
+		} else {
+			for (n=13; n < 16; n++) {
+				$('td:nth-child('+ n +'),th:nth-child('+ n +')').hide();
+			}
+		}
+	} else if (category == "cb_ranking"){
+		if (show == true || show == "true"){
+			for (n=16; n < 25; n++) {
+				$('td:nth-child('+ n +'),th:nth-child('+ n +')').show();
+			}
+		} else {
+			for (n=16; n < 25; n++) {
+				$('td:nth-child('+ n +'),th:nth-child('+ n +')').hide();
+			}
+		}
+	} else if (category == "cb_increase"){
+		if (show == true || show == "true"){
+			for (n=0; n < years.length; n++) {
+				icolumn = n + 25;
+				$('td:nth-child('+ icolumn +'),th:nth-child('+ icolumn +')').show();
+			}
+		} else {
+			for (n=0; n < years.length; n++) {
+				icolumn = n + 25;
+				$('td:nth-child('+ icolumn +'),th:nth-child('+ icolumn +')').hide();
+			}
+		}
+	}
 }
 
 // change Y value
