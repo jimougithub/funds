@@ -152,15 +152,23 @@
 	}
 	if (getCookie('cb_max_increase')!=null || getCookie('cb_max_increase')==false){
 		$('#cb_max_increase').prop('checked', false);
+	} else {
+		setCookie('cb_max_increase', true, 365);
 	}
 	if (getCookie('cb_max_maxdrawdown')!=null || getCookie('cb_max_maxdrawdown')==false){
 		$('#cb_max_maxdrawdown').prop('checked', false);
+	} else {
+		setCookie('cb_max_maxdrawdown', true, 365);
 	}
 	if (getCookie('cb_ranking')!=null || getCookie('cb_ranking')==false){
 		$('#cb_ranking').prop('checked', false);
+	} else {
+		setCookie('cb_ranking', true, 365);
 	}
 	if (getCookie('cb_increase')!=null || getCookie('cb_increase')==false){
 		$('#cb_increase').prop('checked', false);
+	} else {
+		setCookie('cb_increase', true, 365);
 	}
 	$("#cb_max_increase").change(function() {
 		setCookie('cb_max_increase', this.checked, 365);
