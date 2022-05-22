@@ -5,6 +5,7 @@ import pymysql
 import datetime
 import argparse
 from configs import conn
+from entity.FundData import FundData
 
 # Parameters
 parser = argparse.ArgumentParser(description='--frm 001000 --to 005000 --id 515293')
@@ -100,7 +101,8 @@ def updateFundYearly(db, fundInfo, fundDatas):
         return None
 
     # caculate yearly increasment, ranking and drawdown
-    yearVal = list(fundDatas.keys())[0][0:4]        # first record's year
+    fundDatas['99999999'] = FundData(0, 0, 0, 0, 0, 0)  # add a dummy record so that last loop could data will not be lost
+    yearVal = list(fundDatas.keys())[0][0:4]            # first record's year
     currDate = list(fundDatas.keys())[0]
     fundYearlyDatas = {}
     for key, val in fundDatas.items():
