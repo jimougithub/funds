@@ -11,7 +11,7 @@ from entity.FundData import FundData
 parser = argparse.ArgumentParser(description='--frm 001000 --to 005000 --id 515293')
 parser.add_argument('--frm', type=int, default=0)
 parser.add_argument('--to', type=int, default=999999)
-parser.add_argument('--id', type=int, default=0)
+parser.add_argument('--id', type=int, default=991)
 args = parser.parse_args()
 
 # update fund data 1 by 1 from json data ====================================================
@@ -101,13 +101,15 @@ def updateFundYearly(db, fundInfo, fundDatas):
         return None
 
     # caculate yearly increasment, ranking and drawdown
-    fundDatas['99999999'] = FundData(0, 0, 0, 0, 0, 0)  # add a dummy record so that last loop could data will not be lost
+    lastVal = list(fundDatas.keys())[-1]                # last record
     yearVal = list(fundDatas.keys())[0][0:4]            # first record's year
     currDate = list(fundDatas.keys())[0]
     fundYearlyDatas = {}
     for key, val in fundDatas.items():
         year = key[0:4]
-        if yearVal != year:
+        if yearVal != year or lastVal == key:
+            if lastVal == key:
+                fundYearlyDatas[key] = val
             totalIncrease = 0
             avgIncrease = 0
             curRanking = 0
