@@ -97,7 +97,7 @@
 </table>
 </div>
 
-<div id="stockChartContainer" style="margin:0 auto; height: 100%; width: 100%; margin-top:10px"></div>
+<div id="stockChartContainer" style="margin:0 auto; height: 100%; width: 100%; margin-top:30px"></div>
 <div id="div_fund_info" style="margin:0 auto; font-size:12px; width: 100%; margin-top:10px; margin-left:10px"></div>
 
 <script src="./jquery/jquery-1.8.3.min.js"></script>
@@ -150,22 +150,22 @@
 	for (i=1; i <= 10; i++) {
 		if (getCookie('id'+i)) $('#id'+i).val(getCookie('id'+i));
 	}
-	if (getCookie('cb_max_increase')!=null || getCookie('cb_max_increase')==false){
+	if (getCookie('cb_max_increase')!=null && getCookie('cb_max_increase')=="false"){
 		$('#cb_max_increase').prop('checked', false);
 	} else {
 		setCookie('cb_max_increase', true, 365);
 	}
-	if (getCookie('cb_max_maxdrawdown')!=null || getCookie('cb_max_maxdrawdown')==false){
+	if (getCookie('cb_max_maxdrawdown')!=null && getCookie('cb_max_maxdrawdown')=="false"){
 		$('#cb_max_maxdrawdown').prop('checked', false);
 	} else {
 		setCookie('cb_max_maxdrawdown', true, 365);
 	}
-	if (getCookie('cb_ranking')!=null || getCookie('cb_ranking')==false){
+	if (getCookie('cb_ranking')!=null && getCookie('cb_ranking')=="false"){
 		$('#cb_ranking').prop('checked', false);
 	} else {
 		setCookie('cb_ranking', true, 365);
 	}
-	if (getCookie('cb_increase')!=null || getCookie('cb_increase')==false){
+	if (getCookie('cb_increase')!=null && getCookie('cb_increase')=="false"){
 		$('#cb_increase').prop('checked', false);
 	} else {
 		setCookie('cb_increase', true, 365);
