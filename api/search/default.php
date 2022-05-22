@@ -108,7 +108,7 @@ if ($feature!=""){
 	
 	if ($ids != ""){
 		// select fund info
-		$sql="SELECT A.*, B.mg_name FROM fund_info A LEFT JOIN fund_manager B ON (A.fund_managerId=B.mg_id) WHERE A.fund_id IN ($ids) ORDER BY A.fund_id";
+		$sql="SELECT A.*, B.mg_name, B.mg_star, B.mg_workyear, B.mg_fundsize, B.mg_fundcount FROM fund_info A LEFT JOIN fund_manager B ON (A.fund_managerId=B.mg_id) WHERE A.fund_id IN ($ids) ORDER BY A.fund_id";
 		$stmt=$mysqli->prepare($sql);
 		$stmt->execute();
 		$result=$stmt->get_result();

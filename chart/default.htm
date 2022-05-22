@@ -90,9 +90,10 @@
 <tr id="show_columns_tr">
 	<td>列表显示:</td>
 	<td>
+		<input type="checkbox" id="cb_manager_details" name="cb_manager_details" checked="checked"><label for="cb_manager_details">基金经理</label>
 		<input type="checkbox" id="cb_max_increase" name="cb_max_increase" checked="checked"><label for="cb_max_increase">最大升幅</label>
-		<input type="checkbox" id="cb_max_maxdrawdown" name="cb_max_maxdrawdown" checked="checked"><label for="cb_max_maxdrawdown">最大回撤</label>
-		<input type="checkbox" id="cb_ranking" name="cb_ranking" checked="checked"><label for="cb_ranking">历史排名</label>
+		<input type="checkbox" id="cb_max_drawdown" name="cb_max_drawdown" checked="checked"><label for="cb_max_drawdown">最大回撤</label>
+		<input type="checkbox" id="cb_ranking" name="cb_ranking" checked="checked"><label for="cb_ranking">同业排名</label>
 		<input type="checkbox" id="cb_increase" name="cb_increase" checked="checked"><label for="cb_increase">历史升幅</label>
 	</td>
 </tr>
@@ -169,15 +170,20 @@
 	for (i=1; i <= 10; i++) {
 		if (getCookie('id'+i)) $('#id'+i).val(getCookie('id'+i));
 	}
+	if (getCookie('cb_manager_details')!=null && getCookie('cb_manager_details')=="false"){
+		$('#cb_manager_details').prop('checked', false);
+	} else {
+		setCookie('cb_manager_details', true, 365);
+	}
 	if (getCookie('cb_max_increase')!=null && getCookie('cb_max_increase')=="false"){
 		$('#cb_max_increase').prop('checked', false);
 	} else {
 		setCookie('cb_max_increase', true, 365);
 	}
-	if (getCookie('cb_max_maxdrawdown')!=null && getCookie('cb_max_maxdrawdown')=="false"){
-		$('#cb_max_maxdrawdown').prop('checked', false);
+	if (getCookie('cb_max_drawdown')!=null && getCookie('cb_max_drawdown')=="false"){
+		$('#cb_max_drawdown').prop('checked', false);
 	} else {
-		setCookie('cb_max_maxdrawdown', true, 365);
+		setCookie('cb_max_drawdown', true, 365);
 	}
 	if (getCookie('cb_ranking')!=null && getCookie('cb_ranking')=="false"){
 		$('#cb_ranking').prop('checked', false);
@@ -189,13 +195,17 @@
 	} else {
 		setCookie('cb_increase', true, 365);
 	}
+	$("#cb_manager_details").change(function() {
+		setCookie('cb_manager_details', this.checked, 365);
+		show_columns("cb_manager_details", this.checked);
+	});
 	$("#cb_max_increase").change(function() {
 		setCookie('cb_max_increase', this.checked, 365);
 		show_columns("cb_max_increase", this.checked);
 	});
-	$("#cb_max_maxdrawdown").change(function() {
-		setCookie('cb_max_maxdrawdown', this.checked, 365);
-		show_columns("cb_max_maxdrawdown", this.checked);
+	$("#cb_max_drawdown").change(function() {
+		setCookie('cb_max_drawdown', this.checked, 365);
+		show_columns("cb_max_drawdown", this.checked);
 	});
 	$("#cb_ranking").change(function() {
 		setCookie('cb_ranking', this.checked, 365);

@@ -56,9 +56,12 @@ function search_fund_data(feature, keys, date_begin, date_end) {
 						fund_id: info[i]['fund_id'],
 						fund_name: info[i]['fund_name'],
 						fund_type: info[i]['fund_type'],
-						fund_managerId: info[i]['fund_managerId'],
-						mg_name: info[i]['mg_name'],
 						mg_id: info[i]['fund_managerId'],
+						mg_name: info[i]['mg_name'],
+						mg_star: info[i]['mg_star'],
+						mg_workyear: info[i]['mg_workyear'],
+						mg_fundsize: info[i]['mg_fundsize'],
+						mg_fundcount: info[i]['mg_fundcount'],
 						fs_start: info[i]['fs_start'],
 						fund_increase: info[i]['fund_increase'],
 						fund_avg_increase: info[i]['fund_avg_increase'],
@@ -87,7 +90,7 @@ function search_fund_data(feature, keys, date_begin, date_end) {
 						fund_id: '000000',
 						fund_name: '',
 						fund_type: '',
-						fund_managerId: '000000'
+						mg_id: '000000'
 					})
 				}
 				
@@ -403,30 +406,39 @@ function create_chart(){
 // show fund info
 function show_fund_info(feature){
 	var having_data = false;
-	var info_val = "<table id='table_data' class='display'><thead><tr><th>基金代码</th><th>基金名称</th><th>基金类型</th><th>基金经理</th><th>成立日期</th><th>总升幅</th><th>年均升幅</th><th>当前同业排名</th><th>平均同业排名</th><th>最大升幅</th><th>升幅开始</th><th>升幅结束</th><th>最大回撤</th><th>回撤开始</th><th>回撤结束</th><th>YTD同业排名</th><th>1周同业排名</th><th>1个月同业排名</th><th>3个月同业排名</th><th>6个月同业排名</th><th>1年同业排名</th><th>2年同业排名</th><th>3年同业排名</th><th>5年同业排名</th>";
+	var info_val = "<table id='table_data' class='display' style='width:auto; margin:0;'><thead>";
+	info_val += "<tr><th colspan='6'>基金</th><th colspan='5' id='th_manager' bgcolor='#c2d1f0'>基金经理</th><th colspan='3' id='th_maxincrease' bgcolor='#ffa366'>最大升幅</th><th colspan='3' id='th_maxdrawdown' bgcolor='#8cd98c'>最大回撤</th><th colspan='11' id='th_ranking' bgcolor='#b3d9ff'>同业排名</th><th colspan='"+ years.length +"' id='th_increase' bgcolor='#ffbf80'>历史升幅</th></tr>";
+	info_val += "<tr><th>基金代码</th><th>基金名称</th><th>基金类型</th><th>成立日期</th><th>总升幅</th><th>年均升幅</th>";
+	info_val += "<th bgcolor='#c2d1f0'>基金经理</th><th bgcolor='#c2d1f0'>经理评级</th><th bgcolor='#c2d1f0'>经理年资</th><th bgcolor='#c2d1f0'>管理规模</th><th bgcolor='#c2d1f0'>管理基金数</th>";
+	info_val += "<th bgcolor='#ffa366'>升幅</th><th bgcolor='#ffa366'>开始</th><th bgcolor='#ffa366'>结束</th><th bgcolor='#8cd98c'>回撤</th><th bgcolor='#8cd98c'>开始</th><th bgcolor='#8cd98c'>结束</th>";
+	info_val += "<th bgcolor='#b3d9ff'>当前</th><th bgcolor='#b3d9ff'>平均</th><th bgcolor='#b3d9ff'>YTD</th><th bgcolor='#b3d9ff'>1周</th><th bgcolor='#b3d9ff'>1个月</th><th bgcolor='#b3d9ff'>3个月</th><th bgcolor='#b3d9ff'>6个月</th><th bgcolor='#b3d9ff'>1年</th><th bgcolor='#b3d9ff'>2年</th><th bgcolor='#b3d9ff'>3年</th><th bgcolor='#b3d9ff'>5年</th>";
 	years.sort();
 	for (i=0; i < years.length; i++) {
-		info_val = info_val + "<th>"+ years[i] +"升幅</th>";
+		info_val += "<th bgcolor='#ffbf80'>"+ years[i] +"</th>";
 	}
-	info_val = info_val + "</tr></thead><tbody>";
+	info_val += "</tr></thead><tbody>";
 	for (i=0; i < max_count; i++) {
 		if (fund_info[i].fund_id!='000000'){
 			having_data = true;
-			info_val += "<tr><td><b><font color="+ colors[i] +">"+ fund_info[i].fund_id +"</font></b></td><td>"+ 
+			info_val += "<tr><td><a href='http://fund.eastmoney.com/"+ fund_info[i].fund_id +".html?spm=search' rel='noreferrer' target='_blank'>"+ fund_info[i].fund_id +"</a></td><td>"+ 
 									fund_info[i].fund_name +"</td><td>"+ 
 									fund_info[i].fund_type +"</td><td>"+ 
-									"<a href='?feature=manager&keys="+ fund_info[i].mg_id +"'>" + fund_info[i].mg_name +"</a></td><td>"+
 									fund_info[i].fs_start +"</td><td class='txt-right'>"+
 									(fund_info[i].fund_increase*100).toFixed(2) +"%</td><td class='txt-right'>"+
-									"<b><font color='red'>"+ (fund_info[i].fund_avg_increase*100).toFixed(2) +"%</font></b></td><td class='txt-right'>"+
-									(fund_info[i].fund_cur_ranking*100).toFixed(2) +"%</td><td class='txt-right'>"+
-									(fund_info[i].fund_avg_ranking*100).toFixed(2) +"%</td><td class='txt-right'>"+
+									"<b><font color='red'>"+ (fund_info[i].fund_avg_increase*100).toFixed(2) +"%</font></b></td><td>"+
+									"<a href='?feature=manager&keys="+ fund_info[i].mg_id +"'>" + fund_info[i].mg_name +"</a></td><td>"+
+									"Level" + fund_info[i].mg_star +"</td><td class='txt-right'>"+
+									fund_info[i].mg_workyear +"</td><td class='txt-right'>"+
+									fund_info[i].mg_fundsize +"</td><td class='txt-right'>"+
+									fund_info[i].mg_fundcount +"</td><td class='txt-right'>"+
 									"<b><font color='red'>"+ (fund_info[i].fund_maxincrease*100).toFixed(2) +"%</font></b></td><td>"+
 									fund_info[i].fund_maxincrease_begin +"</td><td>"+
 									fund_info[i].fund_maxincrease_end +"</td><td class='txt-right'>"+
 									"<b><font color='#0fd132'>"+ (fund_info[i].fund_maxdrawdown*100).toFixed(2) +"%</font></b></td><td>"+
 									fund_info[i].fund_maxdrawdown_begin +"</td><td>"+
 									fund_info[i].fund_maxdrawdown_end +"</td><td class='txt-right'>"+
+									(fund_info[i].fund_cur_ranking*100).toFixed(2) +"%</td><td class='txt-right'>"+
+									(fund_info[i].fund_avg_ranking*100).toFixed(2) +"%</td><td class='txt-right'>"+
 									(fund_info[i].fund_ranking_ytd*100).toFixed(2) +"%</td><td class='txt-right'>"+
 									(fund_info[i].fund_ranking_1w*100).toFixed(2) +"%</td><td class='txt-right'>"+
 									(fund_info[i].fund_ranking_1m*100).toFixed(2) +"%</td><td class='txt-right'>"+
@@ -462,26 +474,35 @@ function show_fund_info(feature){
 			$('#table_data').DataTable( {
 				paging: false,
 				order: [[0, 'asc']],
+				"autoWidth": false,
+				"dom": '<"pull-left"f><"pull-right"l>tip'
 			} );
 		} else if(feature == "4433") {
 			$('#table_data').DataTable( {
 				paging: false,
-				order: [[6, 'desc']],
+				order: [[5, 'desc']],
+				"autoWidth": false,
+				"dom": '<"pull-left"f><"pull-right"l>tip'
 			} );
 		} else if(feature == "maxdrawdown") {
 			$('#table_data').DataTable( {
 				paging: false,
 				order: [[12, 'asc']],
+				"autoWidth": false,
+				"dom": '<"pull-left"f><"pull-right"l>tip'
 			} );
 		} else if(feature == "manager") {
 			$('#table_data').DataTable( {
 				paging: false,
-				order: [[6, 'desc']],
+				order: [[5, 'desc']],
+				"autoWidth": false,
+				"dom": '<"pull-left"f><"pull-right"l>tip'
 			} );
 		}
 		// show / hide
+		show_columns("cb_manager_details", getCookie('cb_manager_details'));
 		show_columns("cb_max_increase", getCookie('cb_max_increase'));
-		show_columns("cb_max_maxdrawdown", getCookie('cb_max_maxdrawdown'));
+		show_columns("cb_max_drawdown", getCookie('cb_max_drawdown'));
 		show_columns("cb_ranking", getCookie('cb_ranking'));
 		show_columns("cb_increase", getCookie('cb_increase'));
 	} else {
@@ -492,7 +513,7 @@ function show_fund_info(feature){
 // show managers informaiton
 function show_managers_info(feature){
 	var having_data = false;
-	var managers_val = "<table id='table_data' class='display' style='width:500px; margin:0;'><thead><tr><th>经理ID</th><th>基金经理</th><th>经理评级</th><th>工作年资</th><th>管理规模（亿元）</th><th>管理数目</th></tr></thead><tbody>";
+	var managers_val = "<table id='table_data' class='display' style='width:auto; margin:0;'><thead><tr><th>经理ID</th><th>基金经理</th><th>经理评级</th><th>工作年资</th><th>管理规模（亿元）</th><th>管理数目</th></tr></thead><tbody>";
 	for (i=0; i < fund_managers.length; i++) {
 		having_data = true;
 		managers_val += "<tr><td>"+ fund_managers[i].mg_id +"</td><td>"+ 
@@ -511,6 +532,7 @@ function show_managers_info(feature){
 			$('#table_data').DataTable( {
 				paging: false,
 				order: [[2, 'desc']],
+				"autoWidth": false,
 				"dom": '<"pull-left"f><"pull-right"l>tip'
 			} );
 		}
@@ -521,47 +543,67 @@ function show_managers_info(feature){
 
 // show / hide columns
 function show_columns(category, show){
-	if (category == "cb_max_increase"){
+	if (category == "cb_manager_details"){
 		if (show == true || show == "true"){
-			for (n=10; n < 13; n++) {
+			for (n=7; n < 12; n++) {
 				$('td:nth-child('+ n +'),th:nth-child('+ n +')').show();
 			}
+			$('#th_manager').show();
 		} else {
-			for (n=10; n < 13; n++) {
+			for (n=7; n < 12; n++) {
 				$('td:nth-child('+ n +'),th:nth-child('+ n +')').hide();
 			}
+			$('#th_manager').hide();
 		}
-	} else if (category == "cb_max_maxdrawdown"){
+	} else if (category == "cb_max_increase"){
 		if (show == true || show == "true"){
-			for (n=13; n < 16; n++) {
+			for (n=12; n < 15; n++) {
 				$('td:nth-child('+ n +'),th:nth-child('+ n +')').show();
 			}
+			$('#th_maxincrease').show();
 		} else {
-			for (n=13; n < 16; n++) {
+			for (n=12; n < 15; n++) {
 				$('td:nth-child('+ n +'),th:nth-child('+ n +')').hide();
 			}
+			$('#th_maxincrease').hide();
+		}
+	} else if (category == "cb_max_drawdown"){
+		if (show == true || show == "true"){
+			for (n=15; n < 18; n++) {
+				$('td:nth-child('+ n +'),th:nth-child('+ n +')').show();
+			}
+			$('#th_maxdrawdown').show();
+		} else {
+			for (n=15; n < 18; n++) {
+				$('td:nth-child('+ n +'),th:nth-child('+ n +')').hide();
+			}
+			$('#th_maxdrawdown').hide();
 		}
 	} else if (category == "cb_ranking"){
 		if (show == true || show == "true"){
-			for (n=16; n < 25; n++) {
+			for (n=18; n < 29; n++) {
 				$('td:nth-child('+ n +'),th:nth-child('+ n +')').show();
 			}
+			$('#th_ranking').show();
 		} else {
-			for (n=16; n < 25; n++) {
+			for (n=18; n < 29; n++) {
 				$('td:nth-child('+ n +'),th:nth-child('+ n +')').hide();
 			}
+			$('#th_ranking').hide();
 		}
 	} else if (category == "cb_increase"){
 		if (show == true || show == "true"){
 			for (n=0; n < years.length; n++) {
-				icolumn = n + 25;
+				icolumn = n + 29;
 				$('td:nth-child('+ icolumn +'),th:nth-child('+ icolumn +')').show();
 			}
+			$('#th_increase').show();
 		} else {
 			for (n=0; n < years.length; n++) {
-				icolumn = n + 25;
+				icolumn = n + 29;
 				$('td:nth-child('+ icolumn +'),th:nth-child('+ icolumn +')').hide();
 			}
+			$('#th_increase').hide();
 		}
 	}
 }
