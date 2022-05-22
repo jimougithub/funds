@@ -1,6 +1,7 @@
 <?php
 include "../inc/conn.php";
 
+$max_count  = 100;
 $feature	= "ids";
 $keys		= "001857,001880";
 $date_begin	= 19000101;
@@ -18,6 +19,7 @@ if ($feature!=""){
 	$info=array();
 	$yearly=array();
 	$data=array();
+	$managers=array();
 	
 	// select ids
 	if ($feature == "ids"){
@@ -30,7 +32,7 @@ if ($feature!=""){
 			}
 		}
 	} elseif ($feature == "4433"){
-		$sql="SELECT fund_id FROM fund_info WHERE fund_ranking_1y<0.25 AND fund_ranking_2y<0.25 AND fund_ranking_3y<0.25 AND fund_ranking_5y<0.25 AND fund_ranking_6m<0.33 AND fund_ranking_3m<0.33 AND fund_ranking_5y>0 AND fund_update>0 AND fund_type=? AND fs_start<? ORDER BY fund_avg_increase DESC LIMIT 100";
+		$sql="SELECT fund_id FROM fund_info WHERE fund_ranking_1y<0.25 AND fund_ranking_2y<0.25 AND fund_ranking_3y<0.25 AND fund_ranking_5y<0.25 AND fund_ranking_6m<0.33 AND fund_ranking_3m<0.33 AND fund_ranking_5y>0 AND fund_update>0 AND fund_type=? AND fs_start<? ORDER BY fund_avg_increase DESC LIMIT $max_count";
 		$stmt=$mysqli->prepare($sql);
 		$stmt->bind_param("si", $keys, $date_begin);
 		$stmt->execute();
@@ -45,7 +47,7 @@ if ($feature!=""){
 		}
 		$result->free();
 	} elseif ($feature == "maxdrawdown"){
-		$sql="SELECT fund_id FROM fund_info WHERE fund_type=? AND fs_start<? AND fund_maxdrawdown>0 ORDER BY fund_maxdrawdown LIMIT 100";
+		$sql="SELECT fund_id FROM fund_info WHERE fund_type=? AND fs_start<? AND fund_maxdrawdown>0 ORDER BY fund_maxdrawdown LIMIT $max_count";
 		$stmt=$mysqli->prepare($sql);
 		$stmt->bind_param("si", $keys, $date_begin);
 		$stmt->execute();
@@ -57,6 +59,31 @@ if ($feature!=""){
 			} else {
 				$ids .= ","."'$id'";
 			}
+		}
+		$result->free();
+	} elseif ($feature == "manager"){
+		$sql="SELECT fund_id FROM fund_info WHERE fund_managerId=? AND fs_start<? ORDER BY fund_avg_increase DESC LIMIT $max_count";
+		$stmt=$mysqli->prepare($sql);
+		$stmt->bind_param("si", $keys, $date_begin);
+		$stmt->execute();
+		$result=$stmt->get_result();
+		while($row = $result->fetch_assoc()){
+			$id = $row["fund_id"];
+			if ($ids==""){
+				$ids = "'$id'";
+			} else {
+				$ids .= ","."'$id'";
+			}
+		}
+		$result->free();
+	} elseif ($feature == "managerlist"){
+		$sql="SELECT DISTINCT B.* FROM fund_manager B LEFT JOIN fund_info A ON (A.fund_managerId=B.mg_id) WHERE A.fund_type=? AND A.fs_start<? ";
+		$stmt=$mysqli->prepare($sql);
+		$stmt->bind_param("si", $keys, $date_begin);
+		$stmt->execute();
+		$result=$stmt->get_result();
+		while($row = $result->fetch_assoc()){
+			$managers[] = $row;
 		}
 		$result->free();
 	}
@@ -94,7 +121,7 @@ if ($feature!=""){
 		$result->free();
 		$stmt->close();
 	}
-	echo json_encode(array('result'=>0, 'info'=>$info, 'data'=>$data, 'yearly'=>$yearly));
+	echo json_encode(array('result'=>0, 'info'=>$info, 'data'=>$data, 'yearly'=>$yearly, 'managers'=>$managers));
 } else {
 	echo json_encode(array('result'=>9, 'reason'=>'Unknow request'));
 }

@@ -1,3 +1,5 @@
 .txt-right {
   text-align:right;
 }
+.pull-left{float:left!important;}
+.pull-right{float:right!important;}

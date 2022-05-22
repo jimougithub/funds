@@ -11,6 +11,7 @@ var equity_return = new Array();	//净值回报
 var unit_money = new Array();		//分红金额
 var ranking = new Array();			//同类排名
 var years = new Array();			//年份
+var fund_managers = new Array();	//基金经理
 var show_data = new Array();
 var colors = ['#E53935', '#1E88E5', '#43A047', '#FFB300', '#8E24AA', '#00FF33', '#5E35B1', '#FF00FF', '#0033FF', '#990000'];
 
@@ -57,6 +58,7 @@ function search_fund_data(feature, keys, date_begin, date_end) {
 						fund_type: info[i]['fund_type'],
 						fund_managerId: info[i]['fund_managerId'],
 						mg_name: info[i]['mg_name'],
+						mg_id: info[i]['fund_managerId'],
 						fs_start: info[i]['fs_start'],
 						fund_increase: info[i]['fund_increase'],
 						fund_avg_increase: info[i]['fund_avg_increase'],
@@ -188,6 +190,49 @@ function search_fund_data(feature, keys, date_begin, date_end) {
 					}
 				}
 				show_fund_info(feature);
+			} else {
+				console.log(json.reason)
+			}
+		},
+		error: function(XMLHttpRequest, msg, e){
+			console.log(e)
+		}
+	});
+}
+
+function search_manager_data(feature, keys, date_begin, date_end) {
+	// generate url
+	var url = "../api/search/?feature="+ feature +"&keys=" + keys;
+	if (date_begin>0){
+		url = url + "&date_begin="+date_begin;
+	}
+	if (date_end>0){
+		url = url + "&date_end="+date_end;
+	}
+
+	// submit request
+	$.ajax({
+		url: url,
+		type: "GET",
+		dataType: "json",
+		success: function(json){
+			if(json.result==0){
+				// fund manager
+				var managers = json.managers;
+				fund_managers = new Array();
+				for (i=0; i < managers.length; i++) {
+					fund_managers.push({
+						mg_id: managers[i]['mg_id'],
+						mg_name: managers[i]['mg_name'],
+						mg_star: managers[i]['mg_star'],
+						mg_workyear: managers[i]['mg_workyear'],
+						mg_fundsize: managers[i]['mg_fundsize'],
+						mg_fundcount: managers[i]['mg_fundcount'],
+						update_date: managers[i]['update_date']
+					})
+				}
+				// Show data
+				show_managers_info(feature);
 			} else {
 				console.log(json.reason)
 			}
@@ -370,7 +415,7 @@ function show_fund_info(feature){
 			info_val += "<tr><td><b><font color="+ colors[i] +">"+ fund_info[i].fund_id +"</font></b></td><td>"+ 
 									fund_info[i].fund_name +"</td><td>"+ 
 									fund_info[i].fund_type +"</td><td>"+ 
-									fund_info[i].mg_name +"</td><td>"+
+									"<a href='?feature=manager&keys="+ fund_info[i].mg_id +"'>" + fund_info[i].mg_name +"</a></td><td>"+
 									fund_info[i].fs_start +"</td><td class='txt-right'>"+
 									(fund_info[i].fund_increase*100).toFixed(2) +"%</td><td class='txt-right'>"+
 									"<b><font color='red'>"+ (fund_info[i].fund_avg_increase*100).toFixed(2) +"%</font></b></td><td class='txt-right'>"+
@@ -410,8 +455,9 @@ function show_fund_info(feature){
 	}
 	info_val += "</tbody></table>";
 	if (having_data){
-		// sorting
+		// show table
 		$('#div_fund_info').html(info_val);
+		// sorting
 		if (feature == "ids"){
 			$('#table_data').DataTable( {
 				paging: false,
@@ -427,12 +473,47 @@ function show_fund_info(feature){
 				paging: false,
 				order: [[12, 'asc']],
 			} );
+		} else if(feature == "manager") {
+			$('#table_data').DataTable( {
+				paging: false,
+				order: [[6, 'desc']],
+			} );
 		}
 		// show / hide
 		show_columns("cb_max_increase", getCookie('cb_max_increase'));
 		show_columns("cb_max_maxdrawdown", getCookie('cb_max_maxdrawdown'));
 		show_columns("cb_ranking", getCookie('cb_ranking'));
 		show_columns("cb_increase", getCookie('cb_increase'));
+	} else {
+		$('#div_fund_info').html("no data");
+	}
+}
+
+// show managers informaiton
+function show_managers_info(feature){
+	var having_data = false;
+	var managers_val = "<table id='table_data' class='display' style='width:500px; margin:0;'><thead><tr><th>经理ID</th><th>基金经理</th><th>经理评级</th><th>工作年资</th><th>管理规模（亿元）</th><th>管理数目</th></tr></thead><tbody>";
+	for (i=0; i < fund_managers.length; i++) {
+		having_data = true;
+		managers_val += "<tr><td>"+ fund_managers[i].mg_id +"</td><td>"+ 
+								"<a href='?feature=manager&keys="+ fund_managers[i].mg_id +"'>" + fund_managers[i].mg_name +"</a></td><td>"+ 
+								fund_managers[i].mg_star +"</td><td class='txt-right'>"+ 
+								fund_managers[i].mg_workyear +"</td><td class='txt-right'>"+
+								fund_managers[i].mg_fundsize +"</td><td class='txt-right'>"+
+								fund_managers[i].mg_fundcount +"</td></tr>";
+	}
+	managers_val += "</tbody></table>";
+	if (having_data){
+		// show table
+		$('#div_fund_info').html(managers_val);
+		// sorting
+		if (feature == "managerlist"){
+			$('#table_data').DataTable( {
+				paging: false,
+				order: [[2, 'desc']],
+				"dom": '<"pull-left"f><"pull-right"l>tip'
+			} );
+		}
 	} else {
 		$('#div_fund_info').html("no data");
 	}
