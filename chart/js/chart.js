@@ -497,7 +497,7 @@ function show_managers_info(feature){
 		having_data = true;
 		managers_val += "<tr><td>"+ fund_managers[i].mg_id +"</td><td>"+ 
 								"<a href='?feature=manager&keys="+ fund_managers[i].mg_id +"'>" + fund_managers[i].mg_name +"</a></td><td>"+ 
-								fund_managers[i].mg_star +"</td><td class='txt-right'>"+ 
+								"Level" + fund_managers[i].mg_star +"</td><td class='txt-right'>"+ 
 								fund_managers[i].mg_workyear +"</td><td class='txt-right'>"+
 								fund_managers[i].mg_fundsize +"</td><td class='txt-right'>"+
 								fund_managers[i].mg_fundcount +"</td></tr>";
