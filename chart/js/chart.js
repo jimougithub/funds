@@ -1,5 +1,5 @@
 var chart = null;
-const max_count = 100;
+const max_count = 1000;
 var fund_info =  new Array();		//基金信息
 var fund_code =  new Array();		//基金代码
 var shares_position = new Array();	//股票仓位
