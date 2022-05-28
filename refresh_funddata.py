@@ -1,20 +1,25 @@
-import pymysql
-from configs import conn
-from download_fundcode import downloadAllFundCodes
-from download_funddata import downloadAllJsonData
-from update_funddata import updateFundAllData
+import os
+import utlities_common
 
-# Connect to database
-db = pymysql.connect(host=conn.host,user=conn.dbuser,passwd=conn.dbpass,db=conn.dbname,charset='utf8')
+FILE_PATH = os.path.dirname(os.path.abspath(__file__)) + "/code_update_date.ini"
 
 # download fund code
-downloadAllFundCodes(db)
+try:
+    f = open(FILE_PATH, "r")
+    last_date = f.read()
+    f.close()
+except Exception as e:
+    last_date = "19000101"
+
+curr_date = utlities_common.getCurrentDate()
+if curr_date > last_date:
+    os.system("python download_fundcode.py")
+    f = open(FILE_PATH, "w")
+    f.write(curr_date)
+    f.close()
 
 # download fund json files
-downloadAllJsonData(db)
+os.system("python download_funddata.py")
 
 # update fund data into database
-updateFundAllData(db)
-
-# Close database connection
-db.close()
+os.system("python update_funddata.py")
