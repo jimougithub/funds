@@ -231,6 +231,8 @@ function search_manager_data(feature, keys, date_begin, date_end) {
 						mg_workyear: managers[i]['mg_workyear'],
 						mg_fundsize: managers[i]['mg_fundsize'],
 						mg_fundcount: managers[i]['mg_fundcount'],
+						mg_fund_avg_increase: managers[i]['mg_fund_avg_increase'],
+						mg_best_fund_avg_increase: managers[i]['mg_best_fund_avg_increase'],
 						update_date: managers[i]['update_date']
 					})
 				}
@@ -513,13 +515,15 @@ function show_fund_info(feature){
 // show managers informaiton
 function show_managers_info(feature){
 	var having_data = false;
-	var managers_val = "<table id='table_data' class='display' style='width:auto; margin:0;'><thead><tr><th>经理ID</th><th>基金经理</th><th>经理评级</th><th>工作年资</th><th>管理规模（亿元）</th><th>管理数目</th></tr></thead><tbody>";
+	var managers_val = "<table id='table_data' class='display' style='width:auto; margin:0;'><thead><tr><th>经理ID</th><th>基金经理</th><th>经理评级</th><th>工作年资</th><th>平均年均升幅</th><th>最好基金年均升幅</th><th>管理规模（亿元）</th><th>管理数目</th></tr></thead><tbody>";
 	for (i=0; i < fund_managers.length; i++) {
 		having_data = true;
 		managers_val += "<tr><td>"+ fund_managers[i].mg_id +"</td><td>"+ 
 								"<a href='?feature=manager&keys="+ fund_managers[i].mg_id +"'>" + fund_managers[i].mg_name +"</a></td><td>"+ 
 								"Level" + fund_managers[i].mg_star +"</td><td class='txt-right'>"+ 
 								fund_managers[i].mg_workyear +"</td><td class='txt-right'>"+
+								fund_managers[i].mg_fund_avg_increase +"</td><td class='txt-right'>"+
+								fund_managers[i].mg_best_fund_avg_increase +"</td><td class='txt-right'>"+
 								fund_managers[i].mg_fundsize +"</td><td class='txt-right'>"+
 								fund_managers[i].mg_fundcount +"</td></tr>";
 	}

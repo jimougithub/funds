@@ -308,12 +308,24 @@ def caculateMaxChanges(fundDatas, Drawdown):
     else:
         return (acWorths[j]-acWorths[i])/acWorths[j], acDates[i], acDates[j]
 
+# update manager's mg_fund_avg_increase and mg_best_fund_avg_increase -----------------------------------------------
+def updateManagerAvgIncrease(db):
+    cursor = db.cursor()
+    sql = "UPDATE fund_manager LEFT JOIN (SELECT fund_managerId, AVG(fund_avg_increase) fund_avg_increase, MAX(fund_avg_increase) max_fund_avg_increase FROM `fund_info` GROUP BY fund_managerId) B ON mg_id = B.fund_managerId SET mg_fund_avg_increase = fund_avg_increase, mg_best_fund_avg_increase = max_fund_avg_increase"
+    try:
+        cursor.execute(sql)
+        db.commit()
+    except:
+        print("updateManagerAvgIncrease error: " + sql)
 
 # Connect to database
 db = pymysql.connect(host=conn.host,user=conn.dbuser,passwd=conn.dbpass,db=conn.dbname,charset='utf8')
 
 # Load fund infomation one by one
 updateFundAllData(db)
+
+# update manager's performance according to fund performance
+updateManagerAvgIncrease(db)
 
 # Close database
 db.close()
