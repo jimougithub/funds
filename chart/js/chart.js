@@ -522,8 +522,8 @@ function show_managers_info(feature){
 								"<a href='?feature=manager&keys="+ fund_managers[i].mg_id +"'>" + fund_managers[i].mg_name +"</a></td><td>"+ 
 								"Level" + fund_managers[i].mg_star +"</td><td class='txt-right'>"+ 
 								fund_managers[i].mg_workyear +"</td><td class='txt-right'>"+
-								fund_managers[i].mg_fund_avg_increase +"</td><td class='txt-right'>"+
-								fund_managers[i].mg_best_fund_avg_increase +"</td><td class='txt-right'>"+
+								(fund_managers[i].mg_fund_avg_increase*100).toFixed(2) +"</td><td class='txt-right'>"+
+								(fund_managers[i].mg_best_fund_avg_increase*100).toFixed(2) +"</td><td class='txt-right'>"+
 								fund_managers[i].mg_fundsize +"</td><td class='txt-right'>"+
 								fund_managers[i].mg_fundcount +"</td></tr>";
 	}
