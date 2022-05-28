@@ -487,7 +487,7 @@ function show_fund_info(feature){
 		} else if(feature == "maxdrawdown") {
 			$('#table_data').DataTable( {
 				paging: false,
-				order: [[12, 'asc']],
+				order: [[14, 'asc']],
 				"autoWidth": false,
 				"dom": '<"pull-left"f><"pull-right"l>tip'
 			} );
