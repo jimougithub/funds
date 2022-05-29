@@ -236,17 +236,12 @@ def caculateIncrease(fundDatas, currDate):
         str_date = datetime.datetime.strptime(fs_start, "%Y%m%d")
         end_date = datetime.datetime.strptime(str(currDate), "%Y%m%d")
         num_days = (end_date - str_date).days
-        if num_days>360 and num_days<365:
-            num_year = 1
+        if num_days<365:
+            avgIncrease = totalIncrease
         else:
             num_year = num_days / 365
-        if num_year>1:
             avgIncrease = (endAcWorth/strAcWorth)**(1/num_year)-1       #pow(endAcWorth, strAcWorth/num_year) - 1
-        elif num_year>0:
-            avgIncrease = totalIncrease/num_year
-        else:
-            avgIncrease = 0
-    
+
     return totalIncrease, avgIncrease, fs_start
 
 
