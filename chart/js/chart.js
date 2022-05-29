@@ -535,7 +535,7 @@ function show_managers_info(feature){
 		if (feature == "managerlist"){
 			$('#table_data').DataTable( {
 				paging: false,
-				order: [[2, 'desc']],
+				order: [[4, 'desc']],
 				"autoWidth": false,
 				"dom": '<"pull-left"f><"pull-right"l>tip'
 			} );
