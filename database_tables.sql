@@ -102,6 +102,7 @@ CREATE TABLE `fund_info` (
 CREATE TABLE `fund_manager` (
   `mg_id` int(8) NOT NULL,
   `mg_name` varchar(20) NOT NULL,
+  `mg_company` varchar(30) NOT NULL DEFAULT '',
   `mg_star` int(4) NOT NULL,
   `mg_workyear` int(2) NOT NULL,
   `mg_fundsize` decimal(10,2) NOT NULL,
