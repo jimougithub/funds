@@ -306,7 +306,7 @@ def caculateMaxChanges(fundDatas, Drawdown):
 # update manager's mg_fund_avg_increase and mg_best_fund_avg_increase -----------------------------------------------
 def updateManagerAvgIncrease(db):
     cursor = db.cursor()
-    sql = "UPDATE fund_manager LEFT JOIN (SELECT fund_managerId, AVG(fund_avg_increase) fund_avg_increase, MAX(fund_avg_increase) max_fund_avg_increase FROM `fund_info` GROUP BY fund_managerId) B ON mg_id = B.fund_managerId SET mg_fund_avg_increase = fund_avg_increase, mg_best_fund_avg_increase = max_fund_avg_increase"
+    sql = "UPDATE fund_manager LEFT JOIN (SELECT fund_managerId, MAX(fund_companyid) fund_companyid, AVG(fund_avg_increase) fund_avg_increase, MAX(fund_avg_increase) max_fund_avg_increase FROM fund_info GROUP BY fund_managerId) B ON mg_id = B.fund_managerId SET mg_fund_avg_increase = fund_avg_increase, mg_best_fund_avg_increase = max_fund_avg_increase, mg_companyId = fund_companyid"
     try:
         cursor.execute(sql)
         db.commit()
