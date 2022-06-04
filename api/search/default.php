@@ -6,8 +6,10 @@ $feature	= "ids";
 $keys		= "001857,001880";
 $date_begin	= 19000101;
 $date_end	= date("Ymd");
+$type		= "*ALL";
 if (isset($_GET["feature"]))	$feature  = SQLProtect($_GET["feature"]);
 if (isset($_GET["keys"]))		$keys  = SQLProtect($_GET["keys"]);
+if (isset($_GET["type"]))		$type  = SQLProtect($_GET["type"]);
 if (isset($_GET["date_begin"])) $date_begin  = SQLProtect($_GET["date_begin"]);
 if (isset($_GET["date_end"]))	$date_end  = SQLProtect($_GET["date_end"]);
 
@@ -20,6 +22,7 @@ if ($feature!=""){
 	$yearly=array();
 	$data=array();
 	$managers=array();
+	$companies=array();
 	
 	// select ids
 	if ($feature == "ids"){
@@ -88,13 +91,34 @@ if ($feature!=""){
 			}
 		}
 		$result->free();
+	} elseif ($feature == "company"){
+		if ($type == "*ALL"){
+			$sql="SELECT fund_id FROM fund_info WHERE fund_companyid=? AND fs_start<? ORDER BY fund_avg_increase DESC LIMIT $max_count";
+			$stmt=$mysqli->prepare($sql);
+			$stmt->bind_param("ii", $keys, $date_begin);
+		} else {
+			$sql="SELECT fund_id FROM fund_info WHERE fund_companyid=? AND fund_type=? AND fs_start<? AND fund_maxdrawdown>0 ORDER BY fund_maxdrawdown LIMIT $max_count";
+			$stmt=$mysqli->prepare($sql);
+			$stmt->bind_param("isi", $keys, $type, $date_begin);
+		}
+		$stmt->execute();
+		$result=$stmt->get_result();
+		while($row = $result->fetch_assoc()){
+			$id = $row["fund_id"];
+			if ($ids==""){
+				$ids = "'$id'";
+			} else {
+				$ids .= ","."'$id'";
+			}
+		}
+		$result->free();
 	} elseif ($feature == "managerlist"){
 		if ($keys == "*ALL"){
-			$sql="SELECT DISTINCT B.* FROM fund_manager B LEFT JOIN fund_info A ON (A.fund_managerId=B.mg_id) WHERE A.fs_start<? ";
+			$sql="SELECT DISTINCT B.*, C.co_id, C.co_name, C.co_shortname FROM fund_manager B LEFT JOIN fund_info A ON (A.fund_managerId=B.mg_id) LEFT JOIN fund_company C on (A.fund_companyid=C.co_id) WHERE A.fs_start<? ";
 			$stmt=$mysqli->prepare($sql);
 			$stmt->bind_param("i", $date_begin);
 		} else {
-			$sql="SELECT DISTINCT B.* FROM fund_manager B LEFT JOIN fund_info A ON (A.fund_managerId=B.mg_id) WHERE A.fund_type=? AND A.fs_start<? ";
+			$sql="SELECT DISTINCT B.*, C.co_id, C.co_name, C.co_shortname FROM fund_manager B LEFT JOIN fund_info A ON (A.fund_managerId=B.mg_id) LEFT JOIN fund_company C on (A.fund_companyid=C.co_id) WHERE A.fund_type=? AND A.fs_start<? ";
 			$stmt=$mysqli->prepare($sql);
 			$stmt->bind_param("si", $keys, $date_begin);
 		}
@@ -102,6 +126,16 @@ if ($feature!=""){
 		$result=$stmt->get_result();
 		while($row = $result->fetch_assoc()){
 			$managers[] = $row;
+		}
+		$result->free();
+	} elseif ($feature == "companylist"){
+		$sql="SELECT * FROM fund_company WHERE co_start<? ";
+		$stmt=$mysqli->prepare($sql);
+		$stmt->bind_param("i", $date_begin);
+		$stmt->execute();
+		$result=$stmt->get_result();
+		while($row = $result->fetch_assoc()){
+			$companies[] = $row;
 		}
 		$result->free();
 	}
@@ -141,7 +175,7 @@ if ($feature!=""){
 			$stmt->close();
 		}
 	}
-	echo json_encode(array('result'=>0, 'info'=>$info, 'data'=>$data, 'yearly'=>$yearly, 'managers'=>$managers));
+	echo json_encode(array('result'=>0, 'info'=>$info, 'data'=>$data, 'yearly'=>$yearly, 'managers'=>$managers, 'companies'=>$companies));
 } else {
 	echo json_encode(array('result'=>9, 'reason'=>'Unknow request'));
 }

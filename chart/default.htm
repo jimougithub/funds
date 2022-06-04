@@ -19,6 +19,7 @@
 		<a href="./?feature=4433"><button>4433选基</button></a> 
 		<a href="./?feature=maxdrawdown"><button>最大回撤选基</button></a>
 		<a href="./?feature=managerlist"><button>基金经理</button></a>
+		<a href="./?feature=companylist"><button>基金公司</button></a>
 	</td>
 </tr>
 <tr id="search_id_tr">
@@ -40,6 +41,7 @@
 	<td>基金类型</td>
 	<td>
 		<select name="dropdown_fund_type" id="dropdown_fund_type">
+			<option value="*ALL">--所有--</option>
 			<option value="股票型">股票型</option>
 			<option value="混合型-偏股">混合型-偏股</option>
 			<option value="混合型-偏债">混合型-偏债</option>
@@ -57,7 +59,6 @@
 			<option value="商品（不含QDII）">商品（不含QDII）</option>
 			<option value="FOF">FOF</option>
 			<option value="Reits">Reits</option>
-			<option value="*ALL">--所有--</option>
 		</select>
 	</td>
 </tr>
@@ -144,7 +145,6 @@
 			$("#date_range_tr").hide();
 			$("#date_start_tr").show();
 			$("#show_columns_tr").show();
-			click_search();
 		}
 		if (feature == "managerlist") {
 			$("#search_id_tr").hide();
@@ -153,8 +153,23 @@
 			$("#date_start_tr").show();
 			$("#compare_value_tr").hide();
 			$("#show_columns_tr").hide();
-			click_search();
 		}
+		if (feature == "company") {
+			$("#search_id_tr").hide();
+			$("#search_type_tr").show();
+			$("#date_range_tr").hide();
+			$("#date_start_tr").show();
+			$("#show_columns_tr").show();
+		}
+		if (feature == "companylist") {
+			$("#search_id_tr").hide();
+			$("#search_type_tr").hide();
+			$("#date_range_tr").hide();
+			$("#date_start_tr").show();
+			$("#compare_value_tr").hide();
+			$("#show_columns_tr").hide();
+		}
+		click_search();
 	});
 
 	//retrieve cookie setting
@@ -264,6 +279,16 @@
 		if (feature == "managerlist"){
 			search_by_managerlist(date_start, date_end);
 		}
+
+		// search by manager-----------------------------
+		if (feature == "company"){
+			search_by_company(date_start, date_end);
+		}
+
+		// search by company-----------------------------
+		if (feature == "companylist"){
+			search_by_companylist(date_start, date_end);
+		}
 	}
 
 	// search by ids
@@ -323,6 +348,20 @@
 	function search_by_managerlist(date_start, date_end){
 		key = $('#dropdown_fund_type').val().trim();
 		search_manager_data("managerlist", key, date_start, date_end);
+	}
+
+	// search by company
+	function search_by_company(date_start, date_end){
+		urlParams = new URLSearchParams(window.location.search);
+		type = $('#dropdown_fund_type').val().trim();
+		keys = urlParams.get('keys') + '&type=' + type
+		search_fund_data("company", keys, date_start, date_end);
+	}
+
+	// company list
+	function search_by_companylist(date_start, date_end){
+		key = '*ALL';
+		search_company_data("companylist", key, date_start, date_end);
 	}
 	
 	// change y data
