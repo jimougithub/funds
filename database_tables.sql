@@ -26,6 +26,7 @@ CREATE TABLE `fund_company` (
   `co_id` int(8) NOT NULL,
   `co_code` varchar(10) NOT NULL,
   `co_name` varchar(50) NOT NULL,
+  `co_shortname` varchar(10) NOT NULL DEFAULT '''''',
   `co_start` int(8) NOT NULL,
   `co_fundcount` int(4) NOT NULL,
   `co_manager` varchar(20) NOT NULL,
