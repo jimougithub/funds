@@ -14,6 +14,7 @@ except Exception as e:
 curr_date = utlities_common.getCurrentDate()
 if curr_date > last_date:
     os.system("python3 download_fundcode.py")
+    os.system("python3 download_fundcompany.py")
     f = open(FILE_PATH, "w")
     f.write(curr_date)
     f.close()
