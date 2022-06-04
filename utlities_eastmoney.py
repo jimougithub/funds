@@ -35,6 +35,30 @@ def getAllCode():
         allCode.append(code)
     return allCode
 
+# get all the fund companies
+def getAllCompany():
+    url = 'http://fund.eastmoney.com/Data/FundRankScale.aspx'
+    content = requests.get(url)
+    jsContent = execjs.compile(content.text)
+    rawData = jsContent.eval('json')
+    allRows = rawData['datas']
+    return allRows
+
+# get Company's fund list details
+def getCompanyFundList(cocode):
+    url = 'http://fund.eastmoney.com/Company/'+ cocode +'.html'
+    content = requests.get(url)
+
+    codelist = []
+    try:
+        re_arry = re.findall(r'class="code">(?P<ranking>\d+)</a>', content.text)
+        for code in re_arry:
+            codelist.append(code)
+    except Exception as e:
+        print(e)
+    
+    return codelist
+
 # download json data from eastmoney
 def downloadJsonData(fscode):
     downloadDone = False
@@ -244,4 +268,5 @@ print(getData('110011'))
 fs_codes = getAllCode()
 for code in fs_codes:
     print(code)
+print(getAllCompany())
 '''
