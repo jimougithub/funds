@@ -4,8 +4,10 @@ import utlities_eastmoney
 import pymysql
 import datetime
 import argparse
+import time
+import queue
+import threading
 from configs import conn
-from entity.FundData import FundData
 
 # Parameters
 parser = argparse.ArgumentParser(description='--frm 001000 --to 005000 --id 515293')
@@ -13,6 +15,27 @@ parser.add_argument('--frm', type=int, default=0)
 parser.add_argument('--to', type=int, default=999999)
 parser.add_argument('--id', type=int, default=0)
 args = parser.parse_args()
+
+# variables for thread
+exitFlag = False
+printLock = threading.Lock()
+workQueue = queue.Queue(10)
+threads = []
+
+# multiple thread
+class myThread (threading.Thread):
+    def __init__(self, threadID):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+    def run(self):
+        threadPrint("Thread started：" + self.threadID)
+        threadUpdateFundData(self.threadID)
+        threadPrint("Thread ended：" + self.threadID)
+
+def threadPrint(str):
+    printLock.acquire()
+    print(str)
+    printLock.release()
 
 # update fund data 1 by 1 from json data ====================================================
 def updateFundAllData(db):
@@ -24,9 +47,18 @@ def updateFundAllData(db):
     cursor.execute(sql)
     rows = cursor.fetchall()
     for row in rows:
-        fs_code = row[0]
-        download_date = row[1]
-        # update database
+        workQueue.put(row)
+
+# update fund data
+def threadUpdateFundData(threadID):
+    db = pymysql.connect(host=conn.host,user=conn.dbuser,passwd=conn.dbpass,db=conn.dbname,charset='utf8')
+    while (not workQueue.empty()) or (not exitFlag):
+        try:
+            work = workQueue.get(timeout=2)
+        except:
+            continue
+        fs_code = work[0]
+        curr_Date = work[1]
         fundInfo, fundDatas = utlities_eastmoney.getData(fs_code)
         if fundInfo != None and fundDatas != None:
             # too many data, skip writting fund data for the moment
@@ -34,11 +66,10 @@ def updateFundAllData(db):
                 if writeFundData(db, fs_code, k, fundDatas[k]) == False:
                     # if data already exist no need to continue
                     break
-            updateFundYearly(db, fundInfo, fundDatas)                       # update yearly statistics
-            updateFundManager(db, fundInfo, download_date)                  # update fund manager
-            updateFundInfo(db, fundInfo, fundDatas, download_date)          # update current statistics
-            print(fs_code + ": update done")
-
+            updateFundYearly(db, fundInfo, fundDatas)                   # update yearly statistics
+            updateFundManager(db, fundInfo, curr_Date)                  # update fund manager
+            updateFundInfo(db, fundInfo, fundDatas, curr_Date)          # update current statistics
+            threadPrint(fs_code + ": update done by " + threadID)
 
 # Write data to fund_info ==================================================================
 def updateFundInfo(db, fundInfo, fundDatas, curr_date):
@@ -315,11 +346,22 @@ def updateManagerAvgIncrease(db):
 # Connect to database
 db = pymysql.connect(host=conn.host,user=conn.dbuser,passwd=conn.dbpass,db=conn.dbname,charset='utf8')
 
-# Load fund infomation one by one
+# create threads
+for i in range(0, 10):
+    thread = myThread("Thread" + str(i))
+    thread.start()
+    threads.append(thread)
+
+# assign work to threads
 updateFundAllData(db)
 
 # update manager's performance according to fund performance
 updateManagerAvgIncrease(db)
+exitFlag = True
+
+# wait till all thread complete
+for t in threads:
+    t.join()
 
 # Close database
 db.close()
