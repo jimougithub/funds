@@ -191,20 +191,23 @@ def getData(fscode):
             unitMoney = 0
         fundDatas[utlities_common.epochToISODate(dayWorth['x'])] = FundData(0, dayWorth['y'], 0, dayWorth['equityReturn'], unitMoney, 0)
     for dayACWorth in ACWorthTrend[::-1]:
-        if utlities_common.epochToISODate(dayACWorth[0]) not in fundDatas:
-            fundDatas[utlities_common.epochToISODate(dayACWorth[0])] = FundData(0, 0, 0, 0, 0, 0)
-        if dayACWorth[1] == None: dayACWorth[1] = 0
-        fundDatas[utlities_common.epochToISODate(dayACWorth[0])].acWorth = dayACWorth[1]
+        #if utlities_common.epochToISODate(dayACWorth[0]) not in fundDatas:
+        #    fundDatas[utlities_common.epochToISODate(dayACWorth[0])] = FundData(0, 0, 0, 0, 0, 0)
+        if utlities_common.epochToISODate(dayACWorth[0]) in fundDatas:
+            if dayACWorth[1] == None: dayACWorth[1] = 0
+            fundDatas[utlities_common.epochToISODate(dayACWorth[0])].acWorth = dayACWorth[1]
     for sharePos in sharesPosition[::-1]:
-        if utlities_common.epochToISODate(sharePos[0]) not in fundDatas:
-            fundDatas[utlities_common.epochToISODate(sharePos[0])] = FundData(0, 0, 0, 0, 0, 0)
-        if sharePos[1] == None: sharePos[1] = 0
-        fundDatas[utlities_common.epochToISODate(sharePos[0])].sharesPosition = sharePos[1]
+        #if utlities_common.epochToISODate(sharePos[0]) not in fundDatas:
+        #    fundDatas[utlities_common.epochToISODate(sharePos[0])] = FundData(0, 0, 0, 0, 0, 0)
+        if utlities_common.epochToISODate(sharePos[0]) in fundDatas:
+            if sharePos[1] == None: sharePos[1] = 0
+            fundDatas[utlities_common.epochToISODate(sharePos[0])].sharesPosition = sharePos[1]
     for ranking in rankings[::-1]:
-        if utlities_common.epochToISODate(ranking[0]) not in fundDatas:
-            fundDatas[utlities_common.epochToISODate(ranking[0])] = FundData(0, 0, 0, 0, 0, 0)
-        if ranking[1] == None: ranking[1] = 0
-        fundDatas[utlities_common.epochToISODate(ranking[0])].ranking = ranking[1]
+        #if utlities_common.epochToISODate(ranking[0]) not in fundDatas:
+        #    fundDatas[utlities_common.epochToISODate(ranking[0])] = FundData(0, 0, 0, 0, 0, 0)
+        if utlities_common.epochToISODate(ranking[0]) in fundDatas:
+            if ranking[1] == None: ranking[1] = 0
+            fundDatas[utlities_common.epochToISODate(ranking[0])].ranking = ranking[1]
 
     '''
     # for testing
@@ -216,8 +219,13 @@ def getData(fscode):
     
     fundInfo.displayFundInfo()
     '''
-    
-    return fundInfo, fundDatas
+
+    # sort by key
+    fundDatasSorted = {}
+    for i in sorted(fundDatas, reverse=True):
+        fundDatasSorted[i] = fundDatas[i]
+        
+    return fundInfo, fundDatasSorted
 
 # get FundArchives data
 def getFundArchivesData(fscode):

@@ -11,7 +11,7 @@ from entity.FundData import FundData
 parser = argparse.ArgumentParser(description='--frm 001000 --to 005000 --id 515293')
 parser.add_argument('--frm', type=int, default=0)
 parser.add_argument('--to', type=int, default=999999)
-parser.add_argument('--id', type=int, default=0)
+parser.add_argument('--id', type=int, default=1)
 args = parser.parse_args()
 
 # update fund data 1 by 1 from json data ====================================================
@@ -88,7 +88,6 @@ def updateFundYearly(db, fundInfo, fundDatas):
     # delete old data
     cursor = db.cursor()
     sql = """DELETE FROM fund_yearly WHERE fund_id='%s'""" % fundInfo.fs_Code
-    cursor.execute(sql)
     try:
         cursor.execute(sql)
         db.commit()
