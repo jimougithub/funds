@@ -35,6 +35,7 @@ This project is to extract fund data of China
 1. python3 download_fundcode.py > log.txt &  
 2. python3 download_funddata.py > log.txt &  
 3. python3 update_funddata.py > log.txt &  
+4. python3 refresh_funddata.py > log.txt &		//this refresh_funddata will execute 1, 2, 3 in order
 
 # Show fund data in UI
 http://localhost/funds/chart/default.htm  
