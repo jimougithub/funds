@@ -26,7 +26,7 @@ CREATE TABLE `fund_company` (
   `co_id` int(8) NOT NULL,
   `co_code` varchar(10) NOT NULL,
   `co_name` varchar(50) NOT NULL,
-  `co_shortname` varchar(10) NOT NULL DEFAULT '''''',
+  `co_shortname` varchar(10) NOT NULL DEFAULT '',
   `co_start` int(8) NOT NULL,
   `co_fundcount` int(4) NOT NULL,
   `co_manager` varchar(20) NOT NULL,
@@ -64,6 +64,7 @@ CREATE TABLE `fund_info` (
   `fund_name` varchar(50) NOT NULL,
   `fund_type` varchar(30) NOT NULL DEFAULT 'NA',
   `fund_managerId` varchar(8) NOT NULL DEFAULT '0',
+  `fund_companyid` int(8) NOT NULL DEFAULT '0',
   `fs_start` int(8) NOT NULL DEFAULT '0',
   `fund_increase` decimal(7,4) NOT NULL DEFAULT '0.0000',
   `fund_avg_increase` decimal(7,4) NOT NULL DEFAULT '0.0000',
@@ -102,7 +103,7 @@ CREATE TABLE `fund_info` (
 CREATE TABLE `fund_manager` (
   `mg_id` int(8) NOT NULL,
   `mg_name` varchar(20) NOT NULL,
-  `mg_company` varchar(30) NOT NULL DEFAULT '',
+  `mg_companyId` int(8) NOT NULL DEFAULT '0',
   `mg_star` int(4) NOT NULL,
   `mg_workyear` int(2) NOT NULL,
   `mg_fundsize` decimal(10,2) NOT NULL,
@@ -137,6 +138,12 @@ CREATE TABLE `fund_yearly` (
 --
 
 --
+-- 表的索引 `fund_company`
+--
+ALTER TABLE `fund_company`
+  ADD PRIMARY KEY (`co_id`);
+
+--
 -- 表的索引 `fund_data`
 --
 ALTER TABLE `fund_data`
@@ -147,4 +154,10 @@ ALTER TABLE `fund_data`
 --
 ALTER TABLE `fund_info`
   ADD PRIMARY KEY (`fund_id`);
+
+--
+-- 表的索引 `fund_manager`
+--
+ALTER TABLE `fund_manager`
+  ADD PRIMARY KEY (`mg_id`);
 COMMIT;
