@@ -22,6 +22,10 @@ function xDate(){
 	return date("Y-m-d");
 }
 
+function nDate(){
+	return date("Ymd");
+}
+
 //Julian day
 function xJulianDays(){
 	return unixtojd(time());

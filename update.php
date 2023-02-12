@@ -14,6 +14,13 @@ require_once "./api/inc/conn.php";
 <?php
 $update=$_REQUEST["update"];
 if ($update=="yes"){
+	$fh = fopen('code_update_date.ini','r');
+	if ($last_date = fgets($fh)) {
+		if ($last_date >= nDate()){
+			die("today's data already refreshed");
+		}
+	}
+	fclose($fh);
 	$cmd = 'python3 refresh_funddata.py > log.txt &';
 	try {
 		$ret = shell_exec($cmd);
