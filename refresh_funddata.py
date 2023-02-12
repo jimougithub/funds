@@ -20,3 +20,5 @@ if curr_date > last_date:
     os.system("python3 download_fundcompany.py")
     os.system("python3 download_funddata.py")
     os.system("python3 update_funddata.py")
+else:
+    print("already executed for today")
