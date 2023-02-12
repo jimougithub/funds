@@ -20,7 +20,7 @@ if ($update=="yes"){
 		die("command executed: ". $ret);
 	} catch (Exception $e) {
 		die('error=' . $e->getMessage());
-	}	
+	}
 }
 
 // Fund download status
