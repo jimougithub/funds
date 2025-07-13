@@ -7,6 +7,7 @@ import os
 import utlities_common
 from entity.FundData import FundData
 from entity.FundInfo import FundInfo
+from requests.exceptions import Timeout
 
 #FOLDER_PATH = "D:/Jim/WEB/funds/data/"
 FOLDER_PATH = os.path.dirname(os.path.abspath(__file__)) + "/data/"
@@ -27,7 +28,7 @@ def getFundArchivesDatasUrl(fscode):
 # get all the fund codes
 def getAllCode():
     url = 'http://fund.eastmoney.com/js/fundcode_search.js'
-    content = requests.get(url)
+    content = get_with_retry(url)
     jsContent = execjs.compile(content.text)
     rawData = jsContent.eval('r')
     allCode = []
@@ -38,7 +39,7 @@ def getAllCode():
 # get all the fund companies
 def getAllCompany():
     url = 'http://fund.eastmoney.com/Data/FundRankScale.aspx'
-    content = requests.get(url)
+    content = get_with_retry(url)
     jsContent = execjs.compile(content.text)
     rawData = jsContent.eval('json')
     allRows = rawData['datas']
@@ -47,7 +48,7 @@ def getAllCompany():
 # get Company's fund list details
 def getCompanyFundList(cocode):
     url = 'http://fund.eastmoney.com/Company/'+ cocode +'.html'
-    content = requests.get(url)
+    content = get_with_retry(url)
 
     codelist = []
     try:
@@ -65,7 +66,7 @@ def downloadJsonData(fscode):
     downloadCount = 0
     while downloadDone == False and downloadCount<5:
         try:
-            req = requests.get(getUrl(fscode))
+            req = get_with_retry(getUrl(fscode))
             downloadDone = True
         except Exception as e:
             downloadCount += 1
@@ -88,7 +89,7 @@ def downloadFundArchivesData(fscode):
     downloadCount = 0
     while downloadDone == False and downloadCount<5:
         try:
-            req = requests.get(getFundArchivesDatasUrl(fscode))
+            req = get_with_retry(getFundArchivesDatasUrl(fscode))
             downloadDone = True
         except Exception as e:
             downloadCount += 1
@@ -104,6 +105,18 @@ def downloadFundArchivesData(fscode):
     f.write(req.text)
     f.close()
     return 0
+
+# http get with retry
+def get_with_retry(url, retries=3, timeout=5):
+    for attempt in range(retries):
+        try:
+            response = requests.get(url, timeout=timeout)
+            response.raise_for_status()
+            return response
+        except Timeout:
+            print(f"{attempt+1} times retrying...")
+    print(f"http get retried {retries} times")
+    return None
 
 # get fund's data
 def getData(fscode):
