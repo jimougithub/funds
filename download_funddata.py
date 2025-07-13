@@ -23,13 +23,15 @@ def downloadAllJsonData(db):
     cursor.execute(sql)
     rows = cursor.fetchall()
     i = 0
+    n = 0
     for row in rows:
         # do not download so many data at a time. otherwise will block ip
         i = i + 1
-        if i > 1000:
+        n = n + 1
+        if n > 1000:
             print("---------- Sleep for 60 seconds ----------")
             time.sleep(60)
-            i = 0
+            n = 0
 
         fs_code = row[0]
         # download
