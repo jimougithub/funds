@@ -18,7 +18,9 @@ if curr_date > last_date:
     f.close()
     os.system("python3 download_fundcode.py")
     os.system("python3 download_fundcompany.py")
-    os.system("python3 download_funddata.py")
+    os.system("python3 download_funddata.py --frm 030000 &")
+    os.system("python3 download_funddata.py --frm 020000 --to 029999 &")
+    os.system("python3 download_funddata.py --to 019999")
     os.system("python3 update_funddata.py")
 else:
     print("already executed for today")
