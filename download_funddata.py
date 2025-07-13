@@ -42,7 +42,7 @@ def downloadAllJsonData(db):
             try:
                 cursor.execute(sql)
                 db.commit()
-                print(fs_code + ": download done ("+ i + "/" + len(rows) + ")")
+                print(f"{fs_code}: download done ({i} / {len(rows)})")
             except Exception as e:
                 db.rollback()
                 print(e)
