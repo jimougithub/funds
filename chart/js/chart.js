@@ -702,8 +702,8 @@ function show_columns(category, show){
 		}
 	} else if (category == "op_max_years") {
 		var max_years = 99;
-		if (isNumber(show) == true){
-			max_years = show;
+		if (show != ""){
+			max_years = Number(show);
 		}
 		for (n=0; n < years.length; n++) {
 			icolumn = n + 29;
