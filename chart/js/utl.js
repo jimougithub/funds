@@ -81,3 +81,7 @@ function string2json(json_str) {
         }
     }
 }
+
+function isNumber(value) {
+  return Number.isFinite(value);
+}

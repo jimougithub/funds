@@ -700,6 +700,19 @@ function show_columns(category, show){
 			}
 			$('#th_increase').hide();
 		}
+	} else if (category == "op_max_years") {
+		var max_years = 99;
+		if (isNumber(show) == true){
+			max_years = show;
+		}
+		for (n=0; n < years.length; n++) {
+			icolumn = n + 29;
+			if (n < max_years) {
+				$('td:nth-child('+ icolumn +'),th:nth-child('+ icolumn +')').show();
+			} else {
+				$('td:nth-child('+ icolumn +'),th:nth-child('+ icolumn +')').hide();
+			}
+		}
 	}
 }
 
