@@ -239,6 +239,7 @@
 		show_columns("cb_increase", this.checked);
 	});
 	$("#op_max_years").change(function() {
+		setCookie('op_max_years', $("#op_max_years").val(), 365);
 		show_columns("op_max_years", $("#op_max_years").val());
 	});
 	

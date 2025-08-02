@@ -565,6 +565,7 @@ function show_fund_info(feature){
 		show_columns("cb_max_drawdown", getCookie('cb_max_drawdown'));
 		show_columns("cb_ranking", getCookie('cb_ranking'));
 		show_columns("cb_increase", getCookie('cb_increase'));
+		show_columns("op_max_years", getCookie('op_max_years'));
 	} else {
 		$('#div_fund_info').html("no data");
 	}
