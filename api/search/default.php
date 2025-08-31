@@ -1,7 +1,7 @@
 <?php
 include "../inc/conn.php";
 
-$max_count  = 1000;
+$max_count  = 800;
 $feature	= "ids";
 $keys		= "001857,001880";
 $date_begin	= 19000101;
@@ -118,7 +118,7 @@ if ($feature!=""){
 			$stmt=$mysqli->prepare($sql);
 			$stmt->bind_param("ii", $keys, $date_begin);
 		} else {
-			$sql="SELECT fund_id FROM fund_info WHERE fund_companyid=? AND fund_type=? AND fs_start<? AND fund_maxdrawdown>0 ORDER BY fund_maxdrawdown LIMIT $max_count";
+			$sql="SELECT fund_id FROM fund_info WHERE fund_companyid=? AND fund_type=? AND fs_start<? ORDER BY fund_avg_increase DESC LIMIT $max_count";
 			$stmt=$mysqli->prepare($sql);
 			$stmt->bind_param("isi", $keys, $type, $date_begin);
 		}
