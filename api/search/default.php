@@ -1,7 +1,7 @@
 <?php
 include "../inc/conn.php";
 
-$max_count  = 800;
+$max_count  = 1000;
 $feature	= "ids";
 $keys		= "001857,001880";
 $date_begin	= 19000101;

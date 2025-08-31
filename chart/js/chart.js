@@ -530,7 +530,7 @@ function show_fund_info(feature){
 				"autoWidth": false,
 				"dom": '<"pull-left"f><"pull-right"l>tip'
 			} );
-		} else if(feature == "4433") {
+		} else if(feature == "4433" || feature == "avgincrease") {
 			$('#table_data').DataTable( {
 				paging: false,
 				order: [[5, 'desc']],
