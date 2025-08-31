@@ -76,6 +76,27 @@ if ($feature!=""){
 			}
 		}
 		$result->free();
+	} elseif ($feature == "avgincrease"){
+		if ($keys == "*ALL"){
+			$sql="SELECT fund_id FROM fund_info WHERE fs_start<? ORDER BY fund_avg_increase DESC LIMIT $max_count";
+			$stmt=$mysqli->prepare($sql);
+			$stmt->bind_param("i", $date_begin);
+		} else {
+			$sql="SELECT fund_id FROM fund_info WHERE fund_type=? AND fs_start<? ORDER BY fund_avg_increase DESC LIMIT $max_count";
+			$stmt=$mysqli->prepare($sql);
+			$stmt->bind_param("si", $keys, $date_begin);
+		}
+		$stmt->execute();
+		$result=$stmt->get_result();
+		while($row = $result->fetch_assoc()){
+			$id = $row["fund_id"];
+			if ($ids==""){
+				$ids = "'$id'";
+			} else {
+				$ids .= ","."'$id'";
+			}
+		}
+		$result->free();
 	} elseif ($feature == "manager"){
 		$sql="SELECT fund_id FROM fund_info WHERE fund_managerId=? AND fs_start<? ORDER BY fund_avg_increase DESC LIMIT $max_count";
 		$stmt=$mysqli->prepare($sql);
